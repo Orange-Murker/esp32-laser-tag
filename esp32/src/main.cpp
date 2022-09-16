@@ -1,8 +1,10 @@
 #include <Arduino.h>
+#include "rmt.h"
+
 void setup() {
-// write your initialization code here
+    initialise_rmt();
 }
 
 void loop() {
-// write your code here
+
 }

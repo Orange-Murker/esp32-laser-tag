@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "rmt.h"
 #include <freertos/task.h>
+#include <Adafruit_NeoPixel.h>
 
 void setup() {
     initialise_rmt();

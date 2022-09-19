@@ -1,0 +1,21 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: "lzrtag_$$3cr3t"
+      POSTGRES_USER: "lzrtag"
+      POSTGRES_DB: "lzrtag"
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "lzrtag@jv0.nl"
+      PGADMIN_DEFAULT_PASSWORD: "lzrtag_$$3cr3t"
+    depends_on:
+      - db
+    ports:
+      - "8080:80"

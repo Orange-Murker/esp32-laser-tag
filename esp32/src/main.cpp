@@ -1,14 +1,12 @@
 #include <Arduino.h>
-#include "rmt.h"
-#include <freertos/task.h>
-#include <Adafruit_NeoPixel.h>
+#include "ir_communication.h"
 
 void setup() {
-    initialise_rmt();
-    //xTaskCreate(rmt_tx_task, "TX Task", 2048, nullptr, 10, nullptr);
-    xTaskCreate(rmt_rx_task, "RX Task", 2048, nullptr, 10, nullptr);
+    // For debugging
+    Serial.begin(115200);
+    initialise_ir();
+    xTaskCreate(ir_receive_task, "IR Receive Task", 10000, NULL, 1, NULL);
 }
 
 void loop() {
-
 }

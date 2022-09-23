@@ -1,4 +1,5 @@
 #include "feedback_to_the_user.h"
+#include <Arduino.h>
 
 void vibrate() {
     digitalWrite(VIBRATOR_PIN, HIGH);

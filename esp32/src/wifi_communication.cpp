@@ -1,5 +1,4 @@
 #include "wifi_communication.h"
-#include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
 

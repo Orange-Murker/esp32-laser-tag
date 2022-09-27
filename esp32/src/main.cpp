@@ -9,6 +9,7 @@ void setup() {
     // For debugging
     Serial.begin(115200);
     initialise_ir();
+    initialise_wifi();
     xTaskCreate(ir_receive_task, "IR Receive Task", 10000, NULL, 1, NULL);
     xTaskCreate(trigger_task, "Trigger Task", 10000, NULL, 1, NULL);
 
@@ -21,5 +22,5 @@ void setup() {
 
 void loop() {
     feedback_update();
-    vTaskDelay(50);
+    vTaskDelay(20);
 }

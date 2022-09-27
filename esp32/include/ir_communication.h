@@ -1,15 +1,16 @@
-#define TONE_PIN                27  // D27 25 & 26 are DAC0 and 1
-#define APPLICATION_PIN         16  // RX2 pin
-#define SEND_PWM_BY_TIMER
+#include <stdint.h>
 
-#define FLASHEND 0xFFFF // Dummy value for platforms where FLASHEND is not defined
+typedef struct ir_packet_t {
+    uint8_t gun_id;
+    uint8_t damage;
+} IrPacket;
 
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
+struct {
+    uint8_t first = 0;
+    uint8_t last = 0;
+    IrPacket packets[256];
+} ir_queue;
 
-#define NO_LED_FEEDBACK_CODE
-
-#include <Arduino.h>
 
 void initialise_ir();
 void ir_receive_task(void* parms);

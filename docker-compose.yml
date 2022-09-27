@@ -19,3 +19,12 @@ services:
       - db
     ports:
       - "8080:80"
+
+  app:
+    build:
+      context: "./"
+#      target: build-backend
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db

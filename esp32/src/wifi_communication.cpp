@@ -60,29 +60,35 @@ void wait_for_game_start() {
     }
 }
 
-void game_updates_task(void*) {
-    // If there is something in the queue
-    if (ir_queue.first != ir_queue.last) {
-        
-        http.begin(rest_address + "playerstatus?token=" + token);
-        StaticJsonDocument<2048> json;
+void game_update_task(void* parms) {
+    QueueHandle_t ir_queue = *((QueueHandle_t*) parms);
+    while (true) {
+        ir_packet_t ir_packet;
+        if(xQueueReceive(ir_queue, &ir_packet, 0) == pdTRUE) {
+        // If there is something in the queue
+        //if (ir_queue.first != ir_queue.last) {
+            Serial.println("Packet Taken From The Queue");
+            
+            http.begin(rest_address + "playerstatus?token=" + token);
+            StaticJsonDocument<1024> json;
 
-        while (ir_queue.first != ir_queue.last) {
-            JsonObject json_packet = json.createNestedObject();
-            // Remove the packet from the queue
-            ir_packet_t packet = ir_queue.packets[ir_queue.first];
-            ir_queue.first++;
+            //while (ir_queue.first != ir_queue.last) {
+                JsonObject json_packet = json.createNestedObject();
+                // Remove the packet from the queue
+                //ir_packet_t packet = ir_queue.packets[ir_queue.first];
+                //ir_queue.first++;
 
-            json_packet["gun_id"] = packet.gun_id;
+                //json_packet["gun_id"] = packet.gun_id;
+            //}
+
+            String json_str;
+            serializeJson(json, json_str);
+            serializeJson(json, Serial);
+
+            http.POST(json_str);
+            http.end();
+        } else {
+            vTaskDelay(pdMS_TO_TICKS(100));
         }
-
-        String json_str;
-        serializeJson(json, json_str);
-        serializeJson(json, Serial);
-
-        http.POST(json_str);
-        http.end();
-    } else {
-        vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

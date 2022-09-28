@@ -13,6 +13,8 @@
 #include "game.h"
 #include "pins.h"
 
+#include <Arduino.h>
+
 #include <IRremote.h>
 #define DECODE_NEC
 
@@ -23,6 +25,7 @@ void initialise_ir() {
 }
 
 void ir_receive_task(void* parms) {
+    QueueHandle_t ir_queue = *((QueueHandle_t*) parms);
     while (true) {
         if (IrReceiver.decode()) {
 
@@ -43,10 +46,12 @@ void ir_receive_task(void* parms) {
             }
 
             game_struct.health = new_health;
+            Serial.print("New health: ");
+            Serial.println(new_health);
 
             // Queue the packet
-            ir_queue.packets[ir_queue.last] = ir_packet;
-            ir_queue.last++;
+            xQueueSend(ir_queue, &ir_packet, portMAX_DELAY);
+            Serial.println("Packet queued");
 
             IrReceiver.resume(); // Enable receiving of the next value
         }

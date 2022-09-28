@@ -1,0 +1,30 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+
+stages:
+  - Test
+  - Build
+
+
+.taggedBase:
+  tags:
+    - rpi
+
+
+build:
+  extends: .taggedBase
+  image: suculent/platformio-docker-build
+  script:
+    - cd esp32
+    - pio run
+  stage: Build
+  needs: []
+  artifacts:
+    paths:
+      - .pio/build/esp32dev/firmware.bin
+      - .pio/build/esp32dev/firmware.elf

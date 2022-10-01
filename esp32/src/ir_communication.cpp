@@ -10,6 +10,7 @@
 #define NO_LED_FEEDBACK_CODE
 
 #include "ir_communication.h"
+#include "feedback_to_the_user.h"
 #include "game.h"
 #include "pins.h"
 
@@ -18,6 +19,8 @@
 #include <IRremote.h>
 #define DECODE_NEC
 
+//TODO: Move game related things into a separate source file
+Game game_struct;
 
 void initialise_ir() {
     IrReceiver.begin(IR_RECEIVE_PIN, DISABLE_LED_FEEDBACK);
@@ -50,6 +53,8 @@ void ir_receive_task(void* parms) {
                 Serial.print("New health: ");
                 Serial.println(new_health);
 
+                got_shot_feedback(game_struct.health);
+
                 // Queue the packet
                 xQueueSend(ir_queue, &ir_packet, portMAX_DELAY);
             }
@@ -62,6 +67,9 @@ void ir_receive_task(void* parms) {
 
 
 void shoot_ir() {
-    IrSender.sendNEC(GUN_ID, GUN_DAMAGE_DEALT, 0);
+    if (game_struct.health != 0) {
+        trigger_pressed_feedback();
+        IrSender.sendNEC(GUN_ID, GUN_DAMAGE_DEALT, 0);
+    }
 }
 

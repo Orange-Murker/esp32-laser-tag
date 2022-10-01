@@ -1,7 +1,6 @@
 #include "button_handler.h"
 #include "pins.h"
 #include "ir_communication.h"
-#include "feedback_to_the_user.h"
 #include <Arduino.h>
 
 static TaskHandle_t trigger_task_handle = NULL;
@@ -21,11 +20,12 @@ void trigger_task(void* parms) {
         while (last_trigger_time + 50 > millis()) {
             vTaskDelay(pdMS_TO_TICKS(5));
         }
-        // If trigger is down
+
+        // If the trigger is down
         if (!digitalRead(TRIGGER_PIN)) {
             shoot_ir();
-            trigger_pressed_feedback();
         }
+
         // If the interrupt has already given another notification during the time we were processing the last one
         // Take it without blocking
         ulTaskNotifyTake(pdTRUE, 0);

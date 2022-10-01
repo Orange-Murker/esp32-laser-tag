@@ -43,7 +43,7 @@ bool get_game_status() {
         String body = http.getString();
         StaticJsonDocument<512> json;
         deserializeJson(json, body);
-        game_struct.game_running = json["game_running"] == "true";
+        //game_struct.game_running = json["game_running"] == "true";
         
         json.clear();
         return true;
@@ -53,7 +53,7 @@ bool get_game_status() {
 
 void wait_for_game_start() {
     while (true) {
-        if (get_game_status() && game_struct.game_running) {
+        if (get_game_status()) {
             break;
         }
         vTaskDelay(pdMS_TO_TICKS(500));

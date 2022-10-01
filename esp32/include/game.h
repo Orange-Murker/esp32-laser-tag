@@ -1,11 +1,12 @@
 #define GUN_ID 0
-#define GUN_DAMAGE_DEALT 10
+#define GUN_DAMAGE_DEALT 25
+#define MAX_HEALTH 250
 
 #include <stdint.h>
 #include <ArduinoJson.h>
 
-struct {
+struct Game {
     bool game_running;
     uint8_t team [256];
-    uint8_t health = 255;
-} game_struct;
+    uint8_t health = MAX_HEALTH;
+};

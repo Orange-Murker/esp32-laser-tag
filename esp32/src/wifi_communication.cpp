@@ -8,7 +8,7 @@
 const char* ssid = "LZR T4G SOLUTIONS";
 const char* password = "lasertagforall";
 
-String rest_address = "";
+String rest_address = "http://192.168.8.6:3000/";
 String token = "tutunustunsutunlt999349lt9";
 
 HTTPClient http;
@@ -63,30 +63,26 @@ void wait_for_game_start() {
 void game_update_task(void* parms) {
     QueueHandle_t ir_queue = *((QueueHandle_t*) parms);
     while (true) {
-        ir_packet_t ir_packet;
-        if(xQueueReceive(ir_queue, &ir_packet, 0) == pdTRUE) {
-        // If there is something in the queue
-        //if (ir_queue.first != ir_queue.last) {
-            Serial.println("Packet Taken From The Queue");
-            
-            http.begin(rest_address + "playerstatus?token=" + token);
+        if (uxQueueMessagesWaiting(ir_queue) > 0 && WiFi.status() == WL_CONNECTED) {
             StaticJsonDocument<1024> json;
-
-            //while (ir_queue.first != ir_queue.last) {
+            
+            ir_packet_t ir_packet;
+            while (xQueueReceive(ir_queue, &ir_packet, 0) == pdTRUE) {
+                Serial.println("Packet Taken From The Queue");
                 JsonObject json_packet = json.createNestedObject();
-                // Remove the packet from the queue
-                //ir_packet_t packet = ir_queue.packets[ir_queue.first];
-                //ir_queue.first++;
-
-                //json_packet["gun_id"] = packet.gun_id;
-            //}
-
+                json_packet["gun_id"] = ir_packet.gun_id;
+                json_packet["damage"] = ir_packet.damage;
+            }
+            
             String json_str;
             serializeJson(json, json_str);
             serializeJson(json, Serial);
-
+            
+            http.begin(rest_address + "gotshot?token=" + token);
             http.POST(json_str);
             http.end();
+
+
         } else {
             vTaskDelay(pdMS_TO_TICKS(100));
         }

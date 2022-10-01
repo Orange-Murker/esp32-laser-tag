@@ -31,27 +31,28 @@ void ir_receive_task(void* parms) {
 
             // Print a short summary of received data
             IrReceiver.printIRResultShort(&Serial);
-            IrReceiver.printIRSendUsage(&Serial);
-            Serial.println();
 
-            IrPacket ir_packet;
+            if (IrReceiver.decodedIRData.protocol == NEC 
+            //&& IrReceiver.decodedIRData.address != GUN_ID
+            ) {
+                IrPacket ir_packet;
 
-            ir_packet.gun_id = IrReceiver.decodedIRData.address & 0b11111111;
-            ir_packet.damage = IrReceiver.decodedIRData.command & 0b11111111;
+                ir_packet.gun_id = IrReceiver.decodedIRData.address;
+                ir_packet.damage = IrReceiver.decodedIRData.command;
 
-            int new_health = game_struct.health - ir_packet.damage;
+                int new_health = game_struct.health - ir_packet.damage;
 
-            if (new_health < 0) {
-                new_health = 0;
+                if (new_health < 0) {
+                    new_health = 0;
+                }
+
+                game_struct.health = new_health;
+                Serial.print("New health: ");
+                Serial.println(new_health);
+
+                // Queue the packet
+                xQueueSend(ir_queue, &ir_packet, portMAX_DELAY);
             }
-
-            game_struct.health = new_health;
-            Serial.print("New health: ");
-            Serial.println(new_health);
-
-            // Queue the packet
-            xQueueSend(ir_queue, &ir_packet, portMAX_DELAY);
-            Serial.println("Packet queued");
 
             IrReceiver.resume(); // Enable receiving of the next value
         }
@@ -60,7 +61,7 @@ void ir_receive_task(void* parms) {
 }
 
 
-void send_ir_packet(uint16_t address, uint8_t command) {
-    IrSender.sendNEC(address, command, 0);
+void shoot_ir() {
+    IrSender.sendNEC(GUN_ID, GUN_DAMAGE_DEALT, 0);
 }
 

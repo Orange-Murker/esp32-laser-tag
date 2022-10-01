@@ -21,7 +21,6 @@ void fill_leds_solid_colour(CRGB colour) {
 }
 
 void initialise_feedback() {
-    pinMode(TRIGGER_PIN, INPUT_PULLUP);
     pinMode(VIBRATOR_PIN, OUTPUT);
     digitalWrite(VIBRATOR_PIN, LOW);
 

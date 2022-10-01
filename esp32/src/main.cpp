@@ -20,6 +20,7 @@ void setup() {
     pinMode(IR_SEND_PIN, OUTPUT);
     digitalWrite(IR_SEND_PIN, LOW);
 
+    pinMode(TRIGGER_PIN, INPUT_PULLUP);
     attachInterrupt(TRIGGER_PIN, trigger_pressed_isr, CHANGE);
 }
 

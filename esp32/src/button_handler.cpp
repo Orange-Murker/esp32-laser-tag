@@ -4,25 +4,30 @@
 #include "feedback_to_the_user.h"
 #include <Arduino.h>
 
-SemaphoreHandle_t trigger_semaphore = xSemaphoreCreateBinary();
-
-unsigned long last_trigger_time;
+static TaskHandle_t trigger_task_handle = NULL;
+static unsigned long last_trigger_time;
 
 void trigger_pressed_isr() {
+    BaseType_t higher_priority_task_woken = pdFALSE;
     last_trigger_time = millis();
-    xSemaphoreGiveFromISR(trigger_semaphore, 0);
+    vTaskNotifyGiveFromISR(trigger_task_handle, &higher_priority_task_woken);
+    portYIELD_FROM_ISR(higher_priority_task_woken);
 }
 
 void trigger_task(void* parms) {
+    trigger_task_handle = xTaskGetCurrentTaskHandle();
     while (true) {
-        xSemaphoreTake(trigger_semaphore, portMAX_DELAY);
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         while (last_trigger_time + 50 > millis()) {
             vTaskDelay(pdMS_TO_TICKS(5));
         }
         // If trigger is down
         if (!digitalRead(TRIGGER_PIN)) {
-            send_ir_packet(0x0, 0x0);
+            shoot_ir();
             trigger_pressed_feedback();
         }
+        // If the interrupt has already given another notification during the time we were processing the last one
+        // Take it without blocking
+        ulTaskNotifyTake(pdTRUE, 0);
     }
 }

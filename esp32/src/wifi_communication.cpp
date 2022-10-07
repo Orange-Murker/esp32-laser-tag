@@ -66,11 +66,13 @@ void game_update_task(void* parms) {
         if (uxQueueMessagesWaiting(ir_queue) > 0 && WiFi.status() == WL_CONNECTED) {
             StaticJsonDocument<1024> json;
             
-            ir_packet_t ir_packet;
+            JsonArray hits = json.createNestedArray("hits");
+
+            IrPacket ir_packet;
             while (xQueueReceive(ir_queue, &ir_packet, 0) == pdTRUE) {
                 Serial.println("Packet Taken From The Queue");
-                JsonObject json_packet = json.createNestedObject();
-                json_packet["gun_id"] = ir_packet.gun_id;
+                JsonObject json_packet = hits.createNestedObject();
+                json_packet["shooter"] = ir_packet.gun_id;
                 json_packet["damage"] = ir_packet.damage;
             }
             
@@ -82,9 +84,8 @@ void game_update_task(void* parms) {
             http.POST(json_str);
             http.end();
 
-
-        } else {
-            vTaskDelay(pdMS_TO_TICKS(100));
         }
+
+        vTaskDelay(pdMS_TO_TICKS(60000));
     }
 }

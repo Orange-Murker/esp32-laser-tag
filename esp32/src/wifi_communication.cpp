@@ -4,6 +4,7 @@
 #include "game.h"
 #include "ir_communication.h"
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 const char* ssid = "LZR T4G SOLUTIONS";
 const char* password = "lasertagforall";
@@ -61,19 +62,28 @@ void wait_for_game_start() {
 }
 
 void game_update_task(void* parms) {
-    QueueHandle_t ir_queue = *((QueueHandle_t*) parms);
+    GameState* game_state = (GameState*) parms;
     while (true) {
-        if (uxQueueMessagesWaiting(ir_queue) > 0 && WiFi.status() == WL_CONNECTED) {
-            StaticJsonDocument<1024> json;
+        if (uxQueueMessagesWaiting(game_state->ir_queue) > 0 && WiFi.status() == WL_CONNECTED) {
+            // The document cannot get bigger than this with the current health and values of 250 and 25
+            StaticJsonDocument<768> json;
             
+            xSemaphoreTake(game_state->mutex, portMAX_DELAY);
+            json["health"] = game_state->game->health;
+            json["deaths"] = game_state->game->deaths;
+            json["shots_fired"] = game_state->game->shots_fired;
+            xSemaphoreGive(game_state->mutex);
+
             JsonArray hits = json.createNestedArray("hits");
 
             IrPacket ir_packet;
-            while (xQueueReceive(ir_queue, &ir_packet, 0) == pdTRUE) {
-                Serial.println("Packet Taken From The Queue");
+            while (xQueueReceive(game_state->ir_queue, &ir_packet, 0) == pdTRUE) {
                 JsonObject json_packet = hits.createNestedObject();
                 json_packet["shooter"] = ir_packet.gun_id;
                 json_packet["damage"] = ir_packet.damage;
+                if (ir_packet.kill) {
+                    json_packet["kill"] = true;
+                }
             }
             
             String json_str;

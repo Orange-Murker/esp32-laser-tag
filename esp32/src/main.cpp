@@ -3,7 +3,12 @@
 #include "ir_communication.h"
 #include "wifi_communication.h"
 #include "feedback_to_the_user.h"
+#include "game.h"
 #include <Arduino.h>
+
+static Game game {
+    .health = MAX_HEALTH,
+};
 
 void setup() {
     // For debugging
@@ -11,10 +16,15 @@ void setup() {
     initialise_ir();
     initialise_wifi();
 
-    QueueHandle_t ir_queue = xQueueCreate(256, sizeof(ir_packet_t));
-    xTaskCreate(ir_receive_task, "IR Receive Task", 10000, (void*) &ir_queue, 2, NULL);
+    static GameState game_state {
+        xSemaphoreCreateMutex(),
+        xQueueCreate(256, sizeof(IrPacket)),
+        &game,
+    };
+
+    xTaskCreate(ir_receive_task, "IR Receive Task", 20000, (void*) &game_state, 2, NULL);
     xTaskCreate(trigger_task, "Trigger Task", 10000, NULL, 2, NULL);
-    xTaskCreate(game_update_task, "Game Update Task", 10000, (void*) &ir_queue, 1, NULL);
+    xTaskCreate(game_update_task, "Game Update Task", 10000, (void*) &game_state, 1, NULL);
 
     initialise_feedback();
     pinMode(IR_SEND_PIN, OUTPUT);

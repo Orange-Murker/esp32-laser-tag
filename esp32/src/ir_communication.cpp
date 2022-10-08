@@ -19,8 +19,7 @@
 #include <IRremote.h>
 #define DECODE_NEC
 
-//TODO: Move game related things into a separate source file
-Game game_struct;
+static GameState* game_state;
 
 void initialise_ir() {
     IrReceiver.begin(IR_RECEIVE_PIN, DISABLE_LED_FEEDBACK);
@@ -28,38 +27,46 @@ void initialise_ir() {
 }
 
 void ir_receive_task(void* parms) {
-    QueueHandle_t ir_queue = *((QueueHandle_t*) parms);
+    game_state = (GameState*) parms;
+
     while (true) {
         if (IrReceiver.decode()) {
-
             // Print a short summary of received data
             IrReceiver.printIRResultShort(&Serial);
 
+            xSemaphoreTake(game_state->mutex, portMAX_DELAY);
+            
             if (IrReceiver.decodedIRData.protocol == NEC 
             //&& IrReceiver.decodedIRData.address != GUN_ID
+            && game_state->game->health > 0
             ) {
-                IrPacket ir_packet;
+                IrPacket ir_packet {
+                    .kill = false,
+                };
 
                 ir_packet.gun_id = IrReceiver.decodedIRData.address;
                 ir_packet.damage = IrReceiver.decodedIRData.command;
 
-                int new_health = game_struct.health - ir_packet.damage;
+                int new_health = game_state->game->health - ir_packet.damage;
 
-                if (new_health < 0) {
+                // Cap the range
+                if (new_health <= 0) {
                     new_health = 0;
+                    ir_packet.kill = true;
                 }
 
-                game_struct.health = new_health;
-                Serial.print("New health: ");
-                Serial.println(new_health);
+                game_state->game->health = new_health;
 
-                got_shot_feedback(game_struct.health);
+                got_shot_feedback(game_state->game->health);
 
                 // Queue the packet
-                xQueueSend(ir_queue, &ir_packet, portMAX_DELAY);
+                xQueueSend(game_state->ir_queue, &ir_packet, portMAX_DELAY);
             }
-
-            IrReceiver.resume(); // Enable receiving of the next value
+            
+            xSemaphoreGive(game_state->mutex);
+            
+            // Enable receiving of the next value
+            IrReceiver.resume();
         }
         vTaskDelay(pdTICKS_TO_MS(20));
     }
@@ -67,8 +74,9 @@ void ir_receive_task(void* parms) {
 
 
 void shoot_ir() {
-    if (game_struct.health != 0) {
+    if (get_health(game_state) != 0) {
         trigger_pressed_feedback();
+        add_shot_fired(game_state);
         IrSender.sendNEC(GUN_ID, GUN_DAMAGE_DEALT, 0);
     }
 }

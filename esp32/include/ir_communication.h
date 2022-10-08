@@ -1,9 +1,10 @@
 #include <stdint.h>
 
-typedef struct ir_packet_t {
+struct IrPacket {
     uint8_t gun_id;
     uint8_t damage;
-} IrPacket;
+    bool kill;
+};
 
 void initialise_ir();
 void ir_receive_task(void* parms);

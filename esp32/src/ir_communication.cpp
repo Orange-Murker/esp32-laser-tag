@@ -58,13 +58,15 @@ void ir_receive_task(void* parms) {
                 game_state->game->health = new_health;
 
                 got_shot_feedback(game_state->game->health);
+                
+                xSemaphoreGive(game_state->mutex);
 
                 // Queue the packet
                 xQueueSend(game_state->ir_queue, &ir_packet, portMAX_DELAY);
+            } else {
+                xSemaphoreGive(game_state->mutex);
             }
-            
-            xSemaphoreGive(game_state->mutex);
-            
+
             // Enable receiving of the next value
             IrReceiver.resume();
         }
@@ -74,10 +76,16 @@ void ir_receive_task(void* parms) {
 
 
 void shoot_ir() {
-    if (get_health(game_state) != 0) {
+    xSemaphoreTake(game_state->mutex, portMAX_DELAY);
+    if (game_state->game->health != 0 && game_state->game->ammo_remaining != 0) {
         trigger_pressed_feedback();
-        add_shot_fired(game_state);
+        game_state->game->shots_fired++;
+        game_state->game->ammo_remaining--;
+        xSemaphoreGive(game_state->mutex);
+        
         IrSender.sendNEC(GUN_ID, GUN_DAMAGE_DEALT, 0);
+    } else {
+        xSemaphoreGive(game_state->mutex);
     }
 }
 

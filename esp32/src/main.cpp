@@ -8,6 +8,7 @@
 
 static Game game {
     .health = MAX_HEALTH,
+    .ammo_remaining = MAX_AMMO,
 };
 
 void setup() {
@@ -22,9 +23,10 @@ void setup() {
         &game,
     };
 
-    xTaskCreate(ir_receive_task, "IR Receive Task", 20000, (void*) &game_state, 2, NULL);
-    xTaskCreate(trigger_task, "Trigger Task", 10000, NULL, 2, NULL);
-    xTaskCreate(game_update_task, "Game Update Task", 10000, (void*) &game_state, 1, NULL);
+    xTaskCreate(ir_receive_task, "IR Receive Task", 1024, (void*) &game_state, 2, NULL);
+    xTaskCreate(trigger_task, "Trigger Task", 1024, NULL, 2, NULL);
+    xTaskCreate(reload_task, "Reload Task", 1024, (void*) &game_state, 2, NULL);
+    xTaskCreate(game_update_task, "Game Update Task", 4096, (void*) &game_state, 1, NULL);
 
     initialise_feedback();
     pinMode(IR_SEND_PIN, OUTPUT);
@@ -32,6 +34,9 @@ void setup() {
 
     pinMode(TRIGGER_PIN, INPUT_PULLUP);
     attachInterrupt(TRIGGER_PIN, trigger_pressed_isr, CHANGE);
+
+    pinMode(RELOAD_PIN, INPUT_PULLUP);
+    attachInterrupt(RELOAD_PIN, reload_pressed_isr, CHANGE);
 }
 
 void loop() {

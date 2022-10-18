@@ -1,0 +1,69 @@
+@startuml
+frame "Class diagram Pi15-42" {
+    Enum Role {
+      Player
+      Operator
+      Admin
+    }
+
+    class users {
+      +username: string
+      +displayName: string
+      +role: Role
+      +password: string
+    }
+
+    class guns {
+      +id: number
+      +secret: string
+    }
+
+    class games {
+      +id: number
+      +started: Date
+      +ended: Date | null
+    }
+
+    class matches {
+      +id: number
+      +options: json
+      +game: number
+    }
+
+    class plays {
+      +match: number
+      +gun: number
+      +player: string
+      +team: number
+    }
+
+    class hits {
+      +id: number
+      +match: number
+      +shooter: number
+      +target: number
+      +damage: number
+      +timestamp: Date
+      +kill: boolean
+    }
+
+    class updates {
+      +id: number
+      +match: number
+      +gun: number
+      +health: number
+      +deaths: number
+      +shotsFired: number
+      +timestamp: Date
+    }
+
+    users -- Role
+    matches -- games
+    plays -- matches
+    plays -- guns
+    plays -- users
+    hits -- plays
+    updates -- plays
+}
+
+@enduml

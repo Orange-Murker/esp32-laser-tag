@@ -1,0 +1,32 @@
+@startuml
+frame "Trust boundary diagram Pi15-42" {
+    package Employees {
+        package System {
+            package RPi {
+                database PostgresQL
+                agent WebServer
+
+                WebServer --> PostgresQL
+            }
+
+            agent Gun
+        }
+
+        actor Admin
+        actor GameMaster as "Game Master"
+
+        Admin -[hidden]-> GameMaster
+        Admin -> RPi : SSH
+        GameMaster -[norank]> WebServer
+    }
+
+
+    actor Player
+
+    Gun -> Gun : IR
+    Gun -[norank]> WebServer : Status updates
+
+    Player -u-> Gun : Shoots
+    Player -> WebServer : View statistics
+}
+@enduml

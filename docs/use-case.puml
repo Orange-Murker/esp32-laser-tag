@@ -1,0 +1,60 @@
+@startuml
+left to right direction
+
+frame "Use case diagram Pi15-42" {
+    actor Player as player
+    actor "Game Master" as gamemaster
+    actor Admin as admin
+    actor Authentication as service <<service>>
+
+    rectangle {
+        usecase "View past stats of own games" as UC1
+        usecase "See health" as UC2
+        usecase "Get shot" as UC3
+        usecase "Reload" as UC4
+        usecase "Shoot" as UC5
+        usecase "Login" as UC6
+        usecase "Create accounts" as UC7
+        usecase "Manage player accounts" as UC8
+        usecase "Delete accounts" as UC9
+        usecase "View stats" as UC10
+        usecase "Select game mode" as UC11
+        usecase "Create new game" as UC12
+        usecase "Form teams" as UC13
+        usecase "Stop game" as UC14
+        usecase "Link gun to a player" as UC15
+        usecase "Start game" as UC16
+        usecase "Manage accounts of game masters" as UC17
+        usecase "Delete accounts" as UC18
+        usecase "Create admin accounts" as UC19
+        usecase "Create accounts" as UC20
+    }
+
+    player --> UC1
+    player --> UC2
+    player --> UC3
+    player --> UC4
+    player --> UC5
+    player --> UC6
+    gamemaster -> UC6
+    gamemaster -> UC8
+    UC8 ..> UC7 : <<include>>
+    UC8 ..> UC9 : <<include>>
+    gamemaster --> UC10
+    gamemaster --> UC12
+    UC12 ..> UC11 : <<include>>
+    UC12 ..> UC13 : <<include>>
+    UC12 ..> UC15 : <<include>>
+    UC12 <.l. UC14 : <<extend>>
+    UC12 <.. UC16 : <<extend>>
+    admin --> UC17
+    UC17 ..> UC18 : <<include>>
+    UC17 ..> UC20 : <<include>>
+    admin --> UC19
+    admin -l-> gamemaster
+    gamemaster -l-> player
+
+    service --u-> UC6
+
+}
+@enduml

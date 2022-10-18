@@ -1,0 +1,20 @@
+@startuml
+frame "Dataflow diagram Pi15-42" {
+    agent "Registered Player"" as player
+    agent "Game Master" as gamemaster
+    agent (Play Game) as play
+    agent (Player Login) as login
+    agent "Admin" as admin
+    database "User Account Datastore" as datastore
+    rectangle (Data Deletion) as deletion
+
+    player <- datastore : Send game data
+    player -d-> login : username \n& password
+    gamemaster -d-> play : Send gun number\nSend username
+    play -d-> datastore : Send game stats
+    login -d-> datastore : Request data
+    admin -l-> datastore : Request data\nRequest deletion
+    admin <- datastore : Send game data
+    datastore -d-> deletion : Game stats\nusername & password
+}
+@enduml

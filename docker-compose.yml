@@ -1,0 +1,8 @@
+version: '3.7'
+
+services:
+  pio:
+    build:
+      context: esp32
+    volumes:
+      - ./esp32:/opt/workspace

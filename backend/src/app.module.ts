@@ -6,6 +6,12 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { GamesModule } from './games/games.module';
+import { MatchesModule } from './matches/matches.module';
+import { GunsModule } from './guns/guns.module';
+import { UpdatesModule } from './updates/updates.module';
+import { PlaysModule } from './plays/plays.module';
+import { HitsModule } from './hits/hits.module';
 
 @Module({
   imports: [
@@ -30,6 +36,12 @@ import { join } from 'path';
       exclude: ['/api/(.*)'],
     }),
     UsersModule,
+    GamesModule,
+    MatchesModule,
+    GunsModule,
+    UpdatesModule,
+    PlaysModule,
+    HitsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

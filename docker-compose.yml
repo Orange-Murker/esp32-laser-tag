@@ -14,7 +14,7 @@ services:
     image: dpage/pgadmin4
     environment:
       PGADMIN_DEFAULT_EMAIL: "lzrtag@jv0.nl"
-      PGADMIN_DEFAULT_PASSWORD: "lzrtag_$$3cr3t"
+      PGADMIN_DEFAULT_PASSWORD: "lzrtag_$$3cr3t" # Double dollar sign for escaping, lzrtag_$3cr3t
     depends_on:
       - db
     ports:

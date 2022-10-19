@@ -23,10 +23,10 @@ void setup() {
         &game,
     };
 
-    xTaskCreate(ir_receive_task, "IR Receive Task", 1024, (void*) &game_state, 2, NULL);
-    xTaskCreate(trigger_task, "Trigger Task", 1024, NULL, 2, NULL);
-    xTaskCreate(reload_task, "Reload Task", 1024, (void*) &game_state, 2, NULL);
-    xTaskCreate(game_update_task, "Game Update Task", 4096, (void*) &game_state, 1, NULL);
+    xTaskCreate(ir_receive_task, "IR Receive Task", 1024, (void*) &game_state, 2, nullptr);
+    xTaskCreate(trigger_task, "Trigger Task", 1024, nullptr, 2, nullptr);
+    xTaskCreate(reload_task, "Reload Task", 1024, (void*) &game_state, 2, nullptr);
+    xTaskCreate(game_update_task, "Game Update Task", 4096, (void*) &game_state, 1, nullptr);
 
     initialise_feedback();
     pinMode(IR_SEND_PIN, OUTPUT);

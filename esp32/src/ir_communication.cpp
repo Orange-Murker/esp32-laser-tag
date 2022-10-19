@@ -1,14 +1,3 @@
-#define TONE_PIN                27  // D27 25 & 26 are DAC0 and 1
-#define APPLICATION_PIN         16  // RX2 pin
-#define SEND_PWM_BY_TIMER
-
-#define FLASHEND 0xFFFF // Dummy value for platforms where FLASHEND is not defined
-
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-
-#define NO_LED_FEEDBACK_CODE
-
 #include "ir_communication.h"
 #include "feedback_to_the_user.h"
 #include "game.h"
@@ -17,6 +6,13 @@
 #include <Arduino.h>
 
 #include <IRremote.h>
+#define TONE_PIN                27  // D27 25 & 26 are DAC0 and 1
+#define APPLICATION_PIN         16  // RX2 pin
+#define SEND_PWM_BY_TIMER
+#define FLASHEND 0xFFFF // Dummy value for platforms where FLASHEND is not defined
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#define NO_LED_FEEDBACK_CODE
 #define DECODE_NEC
 
 static GameState* game_state;
@@ -37,8 +33,8 @@ void ir_receive_task(void* parms) {
             xSemaphoreTake(game_state->mutex, portMAX_DELAY);
             
             if (IrReceiver.decodedIRData.protocol == NEC 
-            //&& IrReceiver.decodedIRData.address != GUN_ID
-            && game_state->game->health > 0
+                //&& IrReceiver.decodedIRData.address != GUN_ID
+                && game_state->game->health > 0
             ) {
                 IrPacket ir_packet {
                     .kill = false,

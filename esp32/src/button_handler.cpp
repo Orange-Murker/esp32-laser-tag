@@ -4,7 +4,7 @@
 #include "game.h"
 #include <Arduino.h>
 
-static TaskHandle_t trigger_task_handle = NULL;
+static TaskHandle_t trigger_task_handle = nullptr;
 static unsigned long last_trigger_time;
 
 void trigger_pressed_isr() {
@@ -33,7 +33,7 @@ void trigger_task(void* parms) {
     }
 }
 
-static TaskHandle_t reload_task_handle = NULL;
+static TaskHandle_t reload_task_handle = nullptr;
 static unsigned long last_reload_time;
 
 void reload_pressed_isr() {

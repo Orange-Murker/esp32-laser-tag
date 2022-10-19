@@ -88,4 +88,3 @@ void shoot_ir() {
         xSemaphoreGive(game_state->mutex);
     }
 }
-

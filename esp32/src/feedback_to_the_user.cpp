@@ -31,8 +31,7 @@ int dead_anim_index = 9;
 uint8_t health = 255;
 
 void fill_leds_solid_colour(CRGB colour) {
-    for (int i = 0; i < NUM_LEDS; i++)
-    {
+    for (int i = 0; i < NUM_LEDS; i++) {
         leds[i] = colour;
     }
     FastLED.show();
@@ -56,7 +55,6 @@ void show_health() {
 }
 
 void initialise_feedback() {
-
     pinMode(VIBRATOR_PIN, OUTPUT);
     digitalWrite(VIBRATOR_PIN, LOW);
 
@@ -67,7 +65,7 @@ void initialise_feedback() {
 void feedback_update() {
     if(shot) {
         if(millis() > shot_until) {
-            if (health > 0) {
+            if (!dead) {
                 shot = false;
                 show_health();
             }
@@ -146,11 +144,7 @@ void got_shot_feedback(uint8_t current_health) {
     health = current_health;
 
     if (!dead) {
-        if (health <= 0) {
-
-            dead = true;
-
-        }
+        dead = health <= 0;
 
         digitalWrite(VIBRATOR_PIN, HIGH);
         vibrating = true;

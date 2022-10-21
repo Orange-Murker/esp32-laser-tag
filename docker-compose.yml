@@ -28,3 +28,9 @@ services:
       - "3000:3000"
     environment:
       DB_HOST: db
+
+  pio:
+    build:
+      context: esp32
+    volumes:
+      - ./esp32:/opt/workspace

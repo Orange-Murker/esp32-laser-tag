@@ -1,0 +1,82 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+
+stages:
+  - Test
+  - Build
+  - Visualise
+
+
+.taggedBase:
+  tags:
+    - rpi
+
+
+build-embedded:
+  extends: .taggedBase
+  stage: Build
+#  image: suculent/platformio-docker-build
+#  script:
+#    - cd esp32
+#    - pio run
+  image: alpine
+  script:
+    - echo "TODO"
+  needs: []
+  artifacts:
+    paths:
+      - .pio/build/esp32dev/firmware.bin
+      - .pio/build/esp32dev/firmware.elf
+
+build-web:
+  extends: .taggedBase
+  stage: Build
+  image: alpine
+  script:
+    - echo "TODO"
+  needs: []
+
+test-web:
+  extends: .taggedBase
+  stage: Test
+  image: alpine
+  script:
+    - echo "TODO"
+  needs: [ ]
+
+test-embedded:
+  extends: .taggedBase
+  stage: Test
+  image: alpine
+  script:
+    - echo "TODO"
+  needs: [ ]
+
+lint-embedded:
+  extends: .taggedBase
+  stage: Test
+  image: alpine
+  script:
+    - echo "TODO"
+  needs: [ ]
+
+lint-web:
+  extends: .taggedBase
+  stage: Test
+  image: alpine
+  script:
+    - echo "TODO"
+  needs: [ ]
+
+visualise:
+  extends: .taggedBase
+  stage: Visualise
+  image: alpine
+  script:
+    - echo "TODO"
+  needs: [test-web, test-embedded]

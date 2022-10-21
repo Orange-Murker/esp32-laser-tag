@@ -81,11 +81,12 @@ lint-web:
   stage: Test
   image: node:alpine
   script:
-    - yarn global add eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser npm-run-all prettier eslint-plugin-react
-    - cd backend
-    - yarn lint
-    - cd frontend
-    - yarn lint
+    - echo "TODO"
+#    - yarn global add eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser npm-run-all prettier eslint-plugin-react
+#    - cd backend
+#    - yarn lint
+#    - cd frontend
+#    - yarn lint
   needs: [ ]
 
 visualise:

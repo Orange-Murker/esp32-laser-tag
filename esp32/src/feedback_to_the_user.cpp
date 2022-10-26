@@ -66,7 +66,7 @@ void initialise_feedback() {
 
 void feedback_update() {
     if(shot && (millis() > shot_until)) {
-        if (!dead) {
+        if (health > 0) {
             shot = false;
             show_health();
         } else {
@@ -136,8 +136,6 @@ void trigger_pressed_feedback() {
 
 void got_shot_feedback(uint8_t current_health) {
     health = current_health;
-
-    dead = health <= 0;
 
     digitalWrite(VIBRATOR_PIN, HIGH);
     vibrating = true;

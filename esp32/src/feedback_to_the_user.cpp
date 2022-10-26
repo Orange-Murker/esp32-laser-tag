@@ -25,7 +25,6 @@ unsigned long show_led_until = 0;
 int shoot_anim_index = 0;
 
 boolean shot = false;
-boolean dead = false;
 boolean death_animation = false;
 unsigned long shot_until = 0;
 int dead_anim_index = 9;

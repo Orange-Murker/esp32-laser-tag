@@ -7,12 +7,27 @@
 #define NUM_LEDS 10
 CRGB leds[NUM_LEDS];
 
+const unsigned long animation_delay = 700;
+const unsigned long ms_per_led = animation_delay / NUM_LEDS;
+const unsigned long ms_per_led_dead = 10 * ms_per_led;
+const unsigned int led_death_decay = 255 / NUM_LEDS;
+
 unsigned long vibrate_until = 0;
 bool vibrating = false;
 
-unsigned long show_leds_until = 0;
 const CRGB black = CRGB::Black;
-CRGB led_show_colour = CRGB::Black;
+const CRGB health_color = CRGB::Green;
+const CRGB shooting_color = CRGB::Yellow;
+const CRGB hit_color = CRGB::Red;
+
+boolean shooting = false;
+unsigned long show_led_until = 0;
+int shoot_anim_index = 0;
+
+boolean shot = false;
+boolean death_animation = false;
+unsigned long shot_until = 0;
+int dead_anim_index = 9;
 
 uint8_t health = 255;
 
@@ -25,15 +40,15 @@ void fill_leds_solid_colour(CRGB colour) {
 
 void show_health() {
     uint8_t leds_to_show = (health * NUM_LEDS) / MAX_HEALTH;
-    
+
     // Fill the LEDs with a healthy colour
     for (int i = 0; i < leds_to_show; i++) {
-        leds[i] = CRGB::Green;
+        leds[i] = health_color;
     }
 
     // Fill the LEDs with an unhealthy colour
     for (int i = leds_to_show; i < NUM_LEDS; i++) {
-        leds[i] = CRGB::Black;
+        leds[i] = black;
     }
     FastLED.setBrightness(50);
 
@@ -48,8 +63,35 @@ void initialise_feedback() {
     show_health();
 }
 
-
 void feedback_update() {
+    if(shot && (millis() > shot_until)) {
+        if (health > 0) {
+            shot = false;
+            show_health();
+        } else {
+            if (dead_anim_index >= 0) {
+                if ((millis() <= show_led_until)
+                && !death_animation) {
+                    FastLED.setBrightness(FastLED.getBrightness() - led_death_decay); 
+                    leds[dead_anim_index] = black;
+                    FastLED.show();
+                    death_animation = true;
+                } else {
+                    death_animation = false;
+                    show_led_until = show_led_until + ms_per_led_dead;
+                    dead_anim_index--;
+                }
+            } else {
+                fill_leds_solid_colour(hit_color);
+                FastLED.show();
+                shot = false;
+            // useless unless respawns implemented:
+                // dead_anim_index = NUM_LEDS - 1;
+                // show_led_until = 0;
+            }
+        }
+    }
+
     if (millis() > vibrate_until) {
         if (vibrating) {
             digitalWrite(VIBRATOR_PIN, LOW);
@@ -57,25 +99,38 @@ void feedback_update() {
         }
     }
 
-    if (millis() > show_leds_until) {
-        if (led_show_colour != black) {
-            led_show_colour = CRGB::Black;
+    if (shooting) {
+        if (((millis() <= show_led_until)|| shoot_anim_index == 0)
+        && shoot_anim_index != NUM_LEDS) {
+            if (shoot_anim_index != 0) {
+                leds[shoot_anim_index - 1] = black;
+            }
 
-            // Return to displaying the health after a flash
+            leds[shoot_anim_index] = shooting_color;
+            shoot_anim_index++;
+            show_led_until = millis() + ms_per_led;
+
+            FastLED.show();
+        } else {
+            leds[NUM_LEDS - 1] = black;
+            FastLED.show();
+            shoot_anim_index = 0;
+            show_led_until = 0;
             show_health();
+            shooting = false;
         }
     }
-} 
+}
 
 void trigger_pressed_feedback() {
     digitalWrite(VIBRATOR_PIN, HIGH);
     vibrating = true;
-    vibrate_until = millis() + 80;
-
-    led_show_colour = CRGB::Yellow;
+    vibrate_until = millis() + 20;
+    
     FastLED.setBrightness(255);
-    fill_leds_solid_colour(led_show_colour);
-    show_leds_until = millis() + 80;
+    fill_leds_solid_colour(black);
+    shoot_anim_index = 0;
+    shooting = true;
 }
 
 void got_shot_feedback(uint8_t current_health) {
@@ -85,5 +140,10 @@ void got_shot_feedback(uint8_t current_health) {
     vibrating = true;
     vibrate_until = millis() + 150;
 
-    show_health();
+    FastLED.setBrightness(255);
+    fill_leds_solid_colour(hit_color);
+    FastLED.show();
+    shot = true;
+    shot_until = millis() + ms_per_led;
+    show_led_until = millis() + ms_per_led + 10;
 }

@@ -26,7 +26,7 @@ export default function Login() {
         <div className="flex mt-2">
           {/*<span>Contact the Game Master to recover or create an account</span>*/}
           <div className="flex-grow" />
-          <Link to={"/dashboard"}>
+          <Link to={"/dashboard"} className="mt-4">
             <Button>Log In</Button>
           </Link>
         </div>

@@ -33,7 +33,7 @@ void ir_receive_task(void* parms) {
             xSemaphoreTake(game_state->mutex, portMAX_DELAY);
             
             if (IrReceiver.decodedIRData.protocol == NEC 
-                //&& IrReceiver.decodedIRData.address != GUN_ID
+                && check_shot_id(game_state, IrReceiver.decodedIRData.address)
                 && game_state->game->health > 0
             ) {
                 IrPacket ir_packet {

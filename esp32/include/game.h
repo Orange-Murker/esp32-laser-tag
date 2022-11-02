@@ -9,6 +9,8 @@
 struct Game {
     bool game_running;
     uint8_t team [256];
+    uint8_t team_size;
+    bool team_fire;
     uint8_t health;
     uint8_t ammo_remaining;
     uint16_t deaths;
@@ -27,3 +29,4 @@ uint8_t get_health(GameState* game_state);
 void add_shot_fired(GameState* game_state);
 void reload(GameState* game_state);
 void respawn(GameState* game_state);
+bool check_shot_id(GameState* game_state, uint16_t id);

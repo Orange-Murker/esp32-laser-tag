@@ -31,3 +31,18 @@ void respawn(GameState* game_state) {
     game_state->game->ammo_remaining = MAX_AMMO;
     xSemaphoreGive(game_state->mutex);
 }
+
+// Not thread safe
+bool check_shot_id(GameState* game_state, uint16_t id) {
+    if (id == GUN_ID) {
+        return false;
+    }
+    if (!game_state->game->team_fire) {
+        for (int i = 0; i < game_state->game->team_size; i++) {
+            if (game_state->game->team[i] == id) {
+                return false;
+            }
+        }
+    }
+    return true;
+}

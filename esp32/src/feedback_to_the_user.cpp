@@ -27,9 +27,12 @@ int shoot_anim_index = 0;
 boolean shot = false;
 boolean death_animation = false;
 unsigned long shot_until = 0;
-int dead_anim_index = 9;
+int dead_anim_index = NUM_LEDS - 1;
 
-uint8_t health = 255;
+boolean revived = false;
+int revive_anim_index = NUM_LEDS - 1;
+
+uint8_t health = MAX_HEALTH;
 
 void fill_leds_solid_colour(CRGB colour) {
     for (int i = 0; i < NUM_LEDS; i++) {
@@ -85,9 +88,8 @@ void feedback_update() {
                 fill_leds_solid_colour(hit_color);
                 FastLED.show();
                 shot = false;
-            // useless unless respawns implemented:
-                // dead_anim_index = NUM_LEDS - 1;
-                // show_led_until = 0;
+                dead_anim_index = NUM_LEDS - 1;
+                show_led_until = 0;
             }
         }
     }
@@ -100,7 +102,7 @@ void feedback_update() {
     }
 
     if (shooting) {
-        if (((millis() <= show_led_until)|| shoot_anim_index == 0)
+        if (((millis() <= show_led_until) || shoot_anim_index == 0)
         && shoot_anim_index != NUM_LEDS) {
             if (shoot_anim_index != 0) {
                 leds[shoot_anim_index - 1] = black;
@@ -118,6 +120,34 @@ void feedback_update() {
             show_led_until = 0;
             show_health();
             shooting = false;
+        }
+    }
+
+    if (revived) {
+        if (((millis() <= show_led_until) || revive_anim_index == NUM_LEDS - 1)
+        && revive_anim_index >= 0) {
+            if (revive_anim_index != 9) {
+                leds[revive_anim_index + 1] = health_color;
+            }
+
+            leds[revive_anim_index] = shooting_color;
+            revive_anim_index--;
+            show_led_until = millis() + ms_per_led;
+
+            FastLED.show();
+        } else {
+            leds[0] = health_color;
+            FastLED.show();
+            revive_anim_index = NUM_LEDS - 1;
+            show_led_until = 0;
+            show_health();
+            revived = false;
+
+            digitalWrite(VIBRATOR_PIN, HIGH);
+            vibrating = true;
+            vibrate_until = millis() + 150;
+
+            health = MAX_HEALTH;
         }
     }
 }
@@ -146,4 +176,9 @@ void got_shot_feedback(uint8_t current_health) {
     shot = true;
     shot_until = millis() + ms_per_led;
     show_led_until = millis() + ms_per_led + 10;
+}
+
+void revived_feedback() {
+    FastLED.setBrightness(255);
+    revived = true;
 }

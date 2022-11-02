@@ -180,8 +180,5 @@ void got_shot_feedback(uint8_t current_health) {
 
 void revived_feedback() {
     FastLED.setBrightness(255);
-    fill_leds_solid_colour(black);
-    FastLED.show();
-
     revived = true;
 }

@@ -12,6 +12,7 @@ import { GunsModule } from './guns/guns.module';
 import { UpdatesModule } from './updates/updates.module';
 import { PlaysModule } from './plays/plays.module';
 import { HitsModule } from './hits/hits.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { HitsModule } from './hits/hits.module';
     UpdatesModule,
     PlaysModule,
     HitsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

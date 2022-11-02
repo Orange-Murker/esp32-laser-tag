@@ -8,7 +8,6 @@
 #include <IRremote.h>
 #define TONE_PIN                27  // D27 25 & 26 are DAC0 and 1
 #define APPLICATION_PIN         16  // RX2 pin
-#define SEND_PWM_BY_TIMER
 #define FLASHEND 0xFFFF // Dummy value for platforms where FLASHEND is not defined
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)

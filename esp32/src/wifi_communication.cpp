@@ -20,6 +20,7 @@ void initialise_wifi() {
         vTaskDelay(pdMS_TO_TICKS(500));
     }
     Serial.println("Connected to WIFI");
+    Serial.println(WiFi.localIP());
 }
 
 void game_update_task(void* parms) {
@@ -69,6 +70,7 @@ void game_update_task(void* parms) {
                 
                 xSemaphoreTake(game_state->mutex, portMAX_DELAY);
                 game_state->game->team_fire = r_json["team_fire"];
+                game_state->game->time_to_respawn = r_json["time_to_respawn"];
                 if (!team.isNull()) {
                     int team_size = 0;
                     for (uint8_t x : team) {

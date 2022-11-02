@@ -7,6 +7,7 @@
 #include <Arduino.h>
 
 static Game game {
+    .time_to_respawn = 10,
     .health = MAX_HEALTH,
     .ammo_remaining = MAX_AMMO,
 };
@@ -26,7 +27,8 @@ void setup() {
     xTaskCreate(ir_receive_task, "IR Receive Task", 1024, (void*) &game_state, 2, nullptr);
     xTaskCreate(trigger_task, "Trigger Task", 1024, nullptr, 2, nullptr);
     xTaskCreate(reload_task, "Reload Task", 1024, (void*) &game_state, 2, nullptr);
-    xTaskCreate(game_update_task, "Game Update Task", 4096, (void*) &game_state, 1, nullptr);
+    xTaskCreate(game_update_task, "Game Update Task", 8192, (void*) &game_state, 1, nullptr);
+    xTaskCreate(respawn_task, "Respawn Task", 1024, (void*) &game_state, 3, nullptr);
 
     initialise_feedback();
     pinMode(IR_SEND_PIN, OUTPUT);

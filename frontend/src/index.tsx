@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import GameDashboard from "./pages/GameDashboard";
 import Users from "./pages/Users";
 import { AuthProvider } from "./hooks/useAuth";
+import { requireAuth } from "./components/requireAuth";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -27,11 +28,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/dashboard",
-    element: <GameDashboard />,
+    element: requireAuth(<GameDashboard />),
   },
   {
     path: "/users",
-    element: <Users />,
+    element: requireAuth(<Users />),
   },
 ]);
 

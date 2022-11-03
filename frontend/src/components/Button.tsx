@@ -5,7 +5,7 @@ export default function Button({
   children,
   className,
   ...rest
-}: PropsWithChildren<{ className?: string }>) {
+}: PropsWithChildren<{ className?: string, onClick?: React.MouseEventHandler }>) {
   return (
     <button
       className={

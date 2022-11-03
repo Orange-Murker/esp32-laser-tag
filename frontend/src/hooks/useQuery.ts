@@ -22,7 +22,7 @@ function assembleUrl(
 export function useQuery<T extends object>(
   strings: TemplateStringsArray,
   ...params: (string | number)[]
-): [true, null, null] | [false, string, null] | [false, null, T] {
+) {
   const url = assembleUrl(strings, params);
 
   const [state, setState] = useState<

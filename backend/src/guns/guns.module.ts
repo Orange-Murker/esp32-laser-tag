@@ -8,5 +8,6 @@ import { Gun } from './entities/gun.entity';
   imports: [TypeOrmModule.forFeature([Gun])],
   controllers: [GunsController],
   providers: [GunsService],
+  exports: [TypeOrmModule],
 })
 export class GunsModule {}

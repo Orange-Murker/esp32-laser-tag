@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Game } from '../../games/entities/game.entity';
 
 @Entity()
@@ -17,4 +11,9 @@ export class Match {
 
   @ManyToOne(() => Game, (game) => game.id)
   game: Game;
+
+  @Column({
+    default: false,
+  })
+  finished: boolean;
 }

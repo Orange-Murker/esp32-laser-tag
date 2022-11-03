@@ -1,11 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUpdateDto } from './dto/create-update.dto';
 import { UpdateUpdateDto } from './dto/update-update.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Update } from './entities/update.entity';
 
 @Injectable()
 export class UpdatesService {
-  create(createUpdateDto: CreateUpdateDto) {
-    return 'This action adds a new update';
+  constructor(
+    @InjectRepository(Update)
+    private updatesRepository: Repository<Update>,
+  ) {}
+
+  async create(createUpdateDto: CreateUpdateDto) {
+    const { health, deaths, gunId, shotsFired, matchId } = createUpdateDto;
+    await this.updatesRepository.insert({
+      health,
+      deaths,
+      shots_fired: shotsFired,
+      timestamp: new Date(),
+      play: {
+        matchId,
+        gunId,
+      },
+    });
   }
 
   findAll() {

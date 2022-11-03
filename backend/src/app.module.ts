@@ -13,6 +13,7 @@ import { UpdatesModule } from './updates/updates.module';
 import { PlaysModule } from './plays/plays.module';
 import { HitsModule } from './hits/hits.module';
 import { AuthModule } from './auth/auth.module';
+import { EmbeddedModule } from './embedded/embedded.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { AuthModule } from './auth/auth.module';
     PlaysModule,
     HitsModule,
     AuthModule,
+    EmbeddedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

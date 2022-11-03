@@ -46,6 +46,7 @@ void ir_receive_task(void* parms) {
 
                 // Cap the range
                 if (new_health <= 0) {
+                    game_state->game->deaths++;
                     new_health = 0;
                     ir_packet.kill = true;
                 }

@@ -1,4 +1,5 @@
 #include "game.h"
+#include "feedback_to_the_user.h"
 
 void set_health(GameState* game_state, uint8_t health) {
     xSemaphoreTake(game_state->mutex, portMAX_DELAY);
@@ -29,6 +30,7 @@ void reload(GameState* game_state) {
 void respawn(GameState* game_state) {
     game_state->game->health = MAX_HEALTH;
     game_state->game->ammo_remaining = MAX_AMMO;
+    revived_feedback();
 }
 
 // Not thread safe

@@ -179,6 +179,7 @@ void got_shot_feedback(uint8_t current_health) {
 }
 
 void revived_feedback() {
+    health = MAX_HEALTH;
     FastLED.setBrightness(255);
     revived = true;
 }

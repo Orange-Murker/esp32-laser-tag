@@ -10,6 +10,7 @@ import {
 import Login from "./pages/Login";
 import GameDashboard from "./pages/GameDashboard";
 import Users from "./pages/Users";
+import { AuthProvider } from "./hooks/useAuth";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -36,7 +37,9 @@ const router = createBrowserRouter([
 
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );
 

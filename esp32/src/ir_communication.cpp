@@ -8,7 +8,6 @@
 #include <IRremote.h>
 #define TONE_PIN                27  // D27 25 & 26 are DAC0 and 1
 #define APPLICATION_PIN         16  // RX2 pin
-#define SEND_PWM_BY_TIMER
 #define FLASHEND 0xFFFF // Dummy value for platforms where FLASHEND is not defined
 #define STR_HELPER(x) #x
 #define STR(x) STR_HELPER(x)
@@ -33,7 +32,7 @@ void ir_receive_task(void* parms) {
             xSemaphoreTake(game_state->mutex, portMAX_DELAY);
             
             if (IrReceiver.decodedIRData.protocol == NEC 
-                //&& IrReceiver.decodedIRData.address != GUN_ID
+                && check_shot_id(game_state, IrReceiver.decodedIRData.address)
                 && game_state->game->health > 0
             ) {
                 IrPacket ir_packet {
@@ -47,6 +46,7 @@ void ir_receive_task(void* parms) {
 
                 // Cap the range
                 if (new_health <= 0) {
+                    game_state->game->deaths++;
                     new_health = 0;
                     ir_packet.kill = true;
                 }

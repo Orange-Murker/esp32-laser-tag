@@ -8,7 +8,7 @@ export class GamesService {
     return 'This action adds a new game';
   }
 
-  findAll() {
+  async findAll() {
     return `This action returns all games`;
   }
 

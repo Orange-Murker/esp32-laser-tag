@@ -29,19 +29,23 @@ export class EmbeddedController {
   async postUpdate(
     @Body() statusUpdateDto: StatusUpdateDto,
     @Param('secret') secret: string,
-  ) {
+  ): Promise<GameStatusDto> {
+    console.log('Received update');
     const gunId = await this.gunsService.findIdBySecret(secret);
     if (!gunId) throw new HttpException('Unknown secret', HttpStatus.FORBIDDEN);
+    console.log('Valid secret');
 
     const matchId = await this.playsService.getMatchForGun(gunId);
     if (!matchId)
       throw new HttpException('Not in a match', HttpStatus.FORBIDDEN);
 
-    const { health, deaths, shotsFired } = statusUpdateDto;
+    console.log('New gun update', statusUpdateDto);
+
+    const { health, deaths, shots_fired } = statusUpdateDto;
     await this.updatesService.create({
       health,
       deaths,
-      shotsFired,
+      shots_fired,
       gunId,
       matchId,
     });
@@ -53,17 +57,11 @@ export class EmbeddedController {
       await this.hitsService.create({
         shooter,
         damage,
-        kill,
+        kill: kill ?? false,
         target: gunId,
         match: matchId,
       });
     }
-  }
-
-  @Get(':secret')
-  async gameStatus(@Param('secret') secret: string): Promise<GameStatusDto> {
-    const gunId = await this.gunsService.findIdBySecret(secret);
-    if (!gunId) throw new HttpException('Unknown secret', HttpStatus.FORBIDDEN);
 
     const match = await this.matchesService.getCurrentMatchForGun(gunId);
 

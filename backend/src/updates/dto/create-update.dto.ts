@@ -1,7 +1,7 @@
 export class CreateUpdateDto {
   health: number;
   deaths: number;
-  shotsFired: number;
+  shots_fired: number;
   gunId: number;
   matchId: number;
 }

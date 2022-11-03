@@ -55,15 +55,17 @@ void game_update_task(void* parms) {
             String json_str;
             serializeJson(json, json_str);
             serializeJson(json, Serial);
+            Serial.println("");
             
-            http.begin(rest_address + "guns/update?token=" + token);
+            http.begin(rest_address + "embedded/" + token);
             http.addHeader("Content-Type", "application/json");
             http.useHTTP10(true);
             int code = http.POST(json_str);
-            if (code == 200) {
-                Stream& http_stream = http.getStream();
+            if (code == 201) {
+                String response = http.getString();
+                Serial.println(response);
                 StaticJsonDocument<1024> r_json;
-                deserializeJson(r_json, http_stream);
+                deserializeJson(r_json, response);
                 bool game_running = r_json["game_running"];
 
                 JsonArray team = r_json["team"];
@@ -83,6 +85,6 @@ void game_update_task(void* parms) {
             }
             http.end();
         }
-        vTaskDelay(pdMS_TO_TICKS(60000));
+        vTaskDelay(pdMS_TO_TICKS(10000));
     }
 }

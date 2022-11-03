@@ -9,6 +9,8 @@ import { GunsService } from '../guns/guns.service';
 import { GunsModule } from '../guns/guns.module';
 import { PlaysService } from '../plays/plays.service';
 import { PlaysModule } from '../plays/plays.module';
+import { MatchesService } from '../matches/matches.service';
+import { MatchesModule } from '../matches/matches.module';
 
 @Module({
   controllers: [EmbeddedController],
@@ -18,7 +20,8 @@ import { PlaysModule } from '../plays/plays.module';
     HitsService,
     GunsService,
     PlaysService,
+    MatchesService,
   ],
-  imports: [UpdatesModule, HitsModule, GunsModule, PlaysModule],
+  imports: [UpdatesModule, HitsModule, GunsModule, PlaysModule, MatchesModule],
 })
 export class EmbeddedModule {}

@@ -13,6 +13,7 @@ import { UpdatesService } from '../updates/updates.service';
 import { HitsService } from '../hits/hits.service';
 import { GunsService } from '../guns/guns.service';
 import { PlaysService } from '../plays/plays.service';
+import { MatchesService } from '../matches/matches.service';
 
 @Controller('embedded')
 export class EmbeddedController {
@@ -21,6 +22,7 @@ export class EmbeddedController {
     private readonly updatesService: UpdatesService,
     private readonly hitsService: HitsService,
     private readonly playsService: PlaysService,
+    private readonly matchesService: MatchesService,
   ) {}
 
   @Post(':secret')
@@ -63,15 +65,21 @@ export class EmbeddedController {
     const gunId = await this.gunsService.findIdBySecret(secret);
     if (!gunId) throw new HttpException('Unknown secret', HttpStatus.FORBIDDEN);
 
-    const matchId = await this.playsService.getMatchForGun(gunId);
-    if (!matchId)
-      throw new HttpException('Not in a match', HttpStatus.FORBIDDEN);
+    const match = await this.matchesService.getCurrentMatchForGun(gunId);
+
+    if (!match)
+      return {
+        game_running: false,
+        team_fire: false,
+        time_to_respawn: -1,
+        team: [],
+      };
 
     return {
-      game_running: true,
-      team_fire: false,
-      time_to_respawn: 10,
-      team: [1, 2, 3],
+      game_running: match.running,
+      team_fire: match.options.friendlyFire,
+      time_to_respawn: match.options.respawnTime,
+      team: match.plays.map((play) => play.gunId),
     };
   }
 }

@@ -24,7 +24,7 @@ export class PlaysService {
     return `This action returns a #${id} play`;
   }
 
-  update(id: number, _updatePlayDto: UpdatePlayDto) {
+  update(id: number, updatePlayDto: UpdatePlayDto) {
     return `This action updates a #${id} play`;
   }
 
@@ -38,7 +38,7 @@ export class PlaysService {
       where: {
         gunId,
         match: {
-          finished: false,
+          running: true,
         },
       },
     });

@@ -1,5 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "../App.css";
+import Button from "../components/Button";
 
 const Input = ({ placeholder }: { placeholder: string }) => (
   <input
@@ -24,9 +26,9 @@ export default function Login() {
         <div className="flex mt-2">
           {/*<span>Contact the Game Master to recover or create an account</span>*/}
           <div className="flex-grow" />
-          <button className="border border-black rounded-xl bg-white py-2 px-3 mt-3 text-slate-800">
-            Log In
-          </button>
+          <Link to={"/dashboard"} className="mt-4">
+            <Button>Log In</Button>
+          </Link>
         </div>
       </div>
     </div>

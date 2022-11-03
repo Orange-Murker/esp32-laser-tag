@@ -8,6 +8,8 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Login from "./pages/Login";
+import GameDashboard from "./pages/GameDashboard";
+import Users from "./pages/Users";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -21,6 +23,14 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/dashboard",
+    element: <GameDashboard />,
+  },
+  {
+    path: "/users",
+    element: <Users />,
   },
 ]);
 

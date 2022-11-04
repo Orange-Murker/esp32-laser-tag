@@ -19,12 +19,12 @@ export function Header() {
         <Link to="/dashboard" className="m-auto">
           <Button className="mr-4 align-middle">Current game</Button>
         </Link>
-        {(user?.role ?? Roles.player) >= Roles.gameMaster && (
+        {(user?.role ?? Roles.player) >= Roles.admin && (
           <Link to="/users" className="m-auto">
             <Button className="mr-4">Manage users</Button>
           </Link>
         )}
-        {(user?.role ?? Roles.player) >= Roles.gameMaster && (
+        {(user?.role ?? Roles.player) >= Roles.admin && (
           <Link to="/guns" className="m-auto">
             <Button className="mr-4">Manage guns</Button>
           </Link>

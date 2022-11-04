@@ -27,7 +27,10 @@ export default function GameDashboard() {
   const { user } = useAuth();
   if (isLoading) return <div></div>;
   if (error != null) return <div>{error}</div>;
-  if (game.running == false) return <Navigate to="/games/new" />;
+  if (game.running == false) {
+    if((user?.role ?? Roles.player) >= Roles.gameMaster) return <Navigate to="/games/new" />;
+    else return <Layout><div className="text-white text-5xl text-center">No game in progress</div></Layout>
+  }
 
   const stopGame = async () => {
     const response = await useUpdate`/matches/${game.id}`({}, "DELETE");
@@ -38,19 +41,6 @@ export default function GameDashboard() {
     <Layout>
       <div className="text-white text-5xl text-center">Game #{game.id}</div>
       <hr className="border-emerald-700 my-4" />
-      {/*<div className="flex text-xl text-white">*/}
-      {/*  <div>*/}
-      {/*    <span className="text-emerald-700">Time remaining:</span> mm:ss*/}
-      {/*  </div>*/}
-      {/*  <div className="flex-grow" />*/}
-      {/*  <div>*/}
-      {/*    <span className="text-emerald-700">Players remaining:</span> #*/}
-      {/*  </div>*/}
-      {/*  <div className="flex-grow" />*/}
-      {/*  <div>*/}
-      {/*    <span className="text-emerald-700">Game mode:</span> type*/}
-      {/*  </div>*/}
-      {/*</div>*/}
 
       <table className="text-white border border-emerald-700 rounded-xl border-separate p-4 w-full text-center align-middle mt-4">
         <thead>

@@ -12,24 +12,39 @@ export class GunsService {
     private gunsRepository: Repository<Gun>,
   ) {}
 
-  create(createGunDto: CreateGunDto) {
-    return 'This action adds a new gun';
+  async create(createGunDto: CreateGunDto) {
+    const { displayName, secret } = createGunDto;
+    await this.gunsRepository.insert({
+      displayName,
+      secret,
+    });
   }
 
   findAll() {
-    return this.gunsRepository.find();
+    return this.gunsRepository.find({
+      order: {
+        id: 'ASC',
+      },
+    });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} gun`;
+    return this.gunsRepository.findOneBy({ id });
   }
 
-  update(id: number, _updateGunDto: UpdateGunDto) {
-    return `This action updates a #${id} gun`;
+  async update(id: number, updateGunDto: UpdateGunDto) {
+    const { displayName, secret } = updateGunDto;
+    await this.gunsRepository.update(
+      { id },
+      {
+        displayName,
+        secret: secret === '' ? undefined : secret,
+      },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} gun`;
+  async remove(id: number) {
+    await this.gunsRepository.delete(id);
   }
 
   async findIdBySecret(secret: string): Promise<number | null> {

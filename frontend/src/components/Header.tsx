@@ -21,18 +21,21 @@ export function Header() {
         </Link>
         {(user?.role ?? Roles.player) >= Roles.gameMaster && (
           <Link to="/users" className="m-auto">
-            <Button>Manage users</Button>
+            <Button className="mr-4">Manage users</Button>
+          </Link>
+        )}
+        {(user?.role ?? Roles.player) >= Roles.gameMaster && (
+          <Link to="/guns" className="m-auto">
+            <Button className="mr-4">Manage guns</Button>
           </Link>
         )}
         <div className="flex-grow"></div>
-        {/*<Link to="/login">*/}
         <div
           className="bg-emerald-600 w-20 h-20 rounded-full cursor-pointer"
           onClick={() => logout()}
         >
           <ProfileIcon />
         </div>
-        {/*</Link>*/}
       </header>
       <div className="border-b-8 border-emerald-700 w-screen" />
     </>

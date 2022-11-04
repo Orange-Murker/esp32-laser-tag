@@ -16,8 +16,9 @@ export class GunsController {
   constructor(private readonly gunsService: GunsService) {}
 
   @Post()
-  create(@Body() createGunDto: CreateGunDto) {
-    return this.gunsService.create(createGunDto);
+  async create(@Body() createGunDto: CreateGunDto) {
+    await this.gunsService.create(createGunDto);
+    return {};
   }
 
   @Get()
@@ -31,8 +32,9 @@ export class GunsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGunDto: UpdateGunDto) {
-    return this.gunsService.update(+id, updateGunDto);
+  async update(@Param('id') id: string, @Body() updateGunDto: UpdateGunDto) {
+    await this.gunsService.update(+id, updateGunDto);
+    return { success: true };
   }
 
   @Delete(':id')

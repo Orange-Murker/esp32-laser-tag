@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import "../App.css";
 import { Layout } from "../components/Layout";
 import Button from "../components/Button";
 import { useQuery, useUpdate } from "../hooks/useQuery";
-import { Navigate, redirect, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { Roles } from "../auth";
 
 export default function GameDashboard() {
   const [isLoading, error, game] = useQuery<{
@@ -22,6 +24,7 @@ export default function GameDashboard() {
     running: boolean;
   }>`/matches/active`;
   const navigate = useNavigate();
+  const { user } = useAuth();
   if (isLoading) return <div></div>;
   if (error != null) return <div>{error}</div>;
   if (game.running == false) return <Navigate to="/games/new" />;
@@ -78,10 +81,12 @@ export default function GameDashboard() {
         </tbody>
       </table>
       <div className="flex-grow" />
-      <div className="flex w-full text-2xl">
-        <div className="flex-grow" />
-        <Button onClick={stopGame}>Stop Game</Button>
-      </div>
+      {(user?.role ?? Roles.player) >= Roles.gameMaster && (
+        <div className="flex w-full text-2xl">
+          <div className="flex-grow" />
+          <Button onClick={stopGame}>Stop Game</Button>
+        </div>
+      )}
     </Layout>
   );
 }

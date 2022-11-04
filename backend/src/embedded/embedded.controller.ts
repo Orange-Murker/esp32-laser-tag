@@ -1,9 +1,9 @@
 import {
   Body,
   Controller,
-  Get,
   HttpException,
   HttpStatus,
+  Logger,
   Param,
   Post,
 } from '@nestjs/common';
@@ -14,9 +14,12 @@ import { HitsService } from '../hits/hits.service';
 import { GunsService } from '../guns/guns.service';
 import { PlaysService } from '../plays/plays.service';
 import { MatchesService } from '../matches/matches.service';
+import { EmbeddedService } from './embedded.service';
 
 @Controller('embedded')
 export class EmbeddedController {
+  private readonly logger = new Logger(EmbeddedService.name);
+
   constructor(
     private readonly gunsService: GunsService,
     private readonly updatesService: UpdatesService,
@@ -30,16 +33,24 @@ export class EmbeddedController {
     @Body() statusUpdateDto: StatusUpdateDto,
     @Param('secret') secret: string,
   ): Promise<GameStatusDto> {
-    console.log('Received update');
     const gunId = await this.gunsService.findIdBySecret(secret);
-    if (!gunId) throw new HttpException('Unknown secret', HttpStatus.FORBIDDEN);
-    console.log('Valid secret');
+    if (!gunId) {
+      this.logger.log('Invalid secret');
+      throw new HttpException('Unknown secret', HttpStatus.FORBIDDEN);
+    }
 
-    const matchId = await this.playsService.getMatchForGun(gunId);
-    if (!matchId)
-      throw new HttpException('Not in a match', HttpStatus.FORBIDDEN);
+    const match = await this.matchesService.getCurrentMatchForGun(gunId);
+    if (!match) {
+      this.logger.log(`No match running for gun ${gunId}`);
+      return {
+        game_running: false,
+        team_fire: false,
+        time_to_respawn: -1,
+        team: [],
+      };
+    }
 
-    console.log('New gun update', statusUpdateDto);
+    this.logger.log('New gun update', statusUpdateDto);
 
     const { health, deaths, shots_fired } = statusUpdateDto;
     await this.updatesService.create({
@@ -47,7 +58,7 @@ export class EmbeddedController {
       deaths,
       shots_fired,
       gunId,
-      matchId,
+      matchId: match.id,
     });
 
     for (const hit of statusUpdateDto.hits) {
@@ -59,19 +70,9 @@ export class EmbeddedController {
         damage,
         kill: kill ?? false,
         target: gunId,
-        match: matchId,
+        match: match.id,
       });
     }
-
-    const match = await this.matchesService.getCurrentMatchForGun(gunId);
-
-    if (!match)
-      return {
-        game_running: false,
-        team_fire: false,
-        time_to_respawn: -1,
-        team: [],
-      };
 
     return {
       game_running: match.running,

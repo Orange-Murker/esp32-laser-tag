@@ -27,6 +27,6 @@ export class Match {
   })
   running: boolean;
 
-  @OneToMany(() => Play, (play) => play.match)
+  @OneToMany(() => Play, (play) => play.match, { cascade: ['insert'] })
   plays: Play[];
 }

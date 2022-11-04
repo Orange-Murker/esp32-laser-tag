@@ -12,6 +12,9 @@ import GameDashboard from "./pages/GameDashboard";
 import Users from "./pages/Users";
 import { AuthProvider } from "./hooks/useAuth";
 import { requireAuth } from "./components/requireAuth";
+import { CreateGame } from "./pages/CreateGame";
+import { UserDetails } from "./pages/UserDetails";
+import { CreateUser } from './pages/CreateUser';
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -33,6 +36,18 @@ const router = createBrowserRouter([
   {
     path: "/users",
     element: requireAuth(<Users />),
+  },
+  {
+    path: "/users/new",
+    element: requireAuth(<CreateUser />),
+  },
+  {
+    path: "/users/:username",
+    element: requireAuth(<UserDetails />),
+  },
+  {
+    path: "/games/new",
+    element: requireAuth(<CreateGame />),
   },
 ]);
 

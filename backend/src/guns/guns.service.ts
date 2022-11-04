@@ -17,7 +17,7 @@ export class GunsService {
   }
 
   findAll() {
-    return `This action returns all guns`;
+    return this.gunsRepository.find();
   }
 
   findOne(id: number) {

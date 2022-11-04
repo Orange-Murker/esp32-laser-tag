@@ -2,17 +2,12 @@ import React from "react";
 import "../App.css";
 import { Layout } from "../components/Layout";
 import Button from "../components/Button";
-import { useQuery, useUpdate } from "../hooks/useQuery";
+import { useUpdate } from "../hooks/useQuery";
 import { Link } from "react-router-dom";
+import { useUsers } from "../hooks/useUsers";
 
 export default function Users() {
-  const [isLoading, error, users] = useQuery<
-    {
-      username: string;
-      displayName: string;
-      role: string;
-    }[]
-  >`/users`;
+  const [isLoading, error, users] = useUsers();
   if (isLoading) return <div></div>;
   if (error != null) return <div>{error}</div>;
 

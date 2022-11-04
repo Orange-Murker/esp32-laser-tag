@@ -14,8 +14,24 @@ export class MatchesService {
     private readonly updatesService: UpdatesService,
   ) {}
 
-  create(createMatchDto: CreateMatchDto) {
-    return 'This action adds a new match';
+  async create(createMatchDto: CreateMatchDto) {
+    return this.matchesRepository.save({
+      options: {
+        friendlyFire: createMatchDto.friendlyFire,
+        respawnTime: createMatchDto.respawnTime,
+      },
+      game: {
+        id: 1,
+      },
+      running: true,
+      plays: createMatchDto.teams.map((team) => ({
+        gunId: team.gun,
+        team: team.team,
+        player: {
+          username: team.player,
+        },
+      })),
+    });
   }
 
   findAll() {
@@ -30,8 +46,15 @@ export class MatchesService {
     return `This action updates a #${id} match`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} match`;
+  stop(id: number) {
+    return this.matchesRepository.update(
+      {
+        id,
+      },
+      {
+        running: false,
+      },
+    );
   }
 
   async getCurrentMatchForGun(gunId: number) {
@@ -59,7 +82,7 @@ export class MatchesService {
         running: true,
       },
     });
-    if (matches.length === 0) return null;
+    if (matches.length === 0) return { running: false };
     const { id, options, running, plays } = matches[0];
 
     const players = [];

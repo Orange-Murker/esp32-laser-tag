@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import "../App.css";
 import { Layout } from "../components/Layout";
 import Button from "../components/Button";
-import { useQuery } from "../hooks/useQuery";
-import { redirect } from "react-router-dom";
+import { useQuery, useUpdate } from "../hooks/useQuery";
+import { Navigate, redirect, useNavigate } from 'react-router-dom';
 
 export default function GameDashboard() {
   const [isLoading, error, game] = useQuery<{
@@ -19,10 +19,17 @@ export default function GameDashboard() {
         shots_fired: number;
       };
     }[];
+    running: boolean;
   }>`/matches/active`;
+  const navigate = useNavigate();
   if (isLoading) return <div></div>;
   if (error != null) return <div>{error}</div>;
-  if(game == null) throw redirect("/games/new");
+  if (game.running == false) return <Navigate to="/games/new" />;
+
+  const stopGame = async () => {
+    const response = await useUpdate`/matches/${game.id}`({}, "DELETE");
+    if (response.success) navigate("/games/new");
+  };
 
   return (
     <Layout>
@@ -73,7 +80,7 @@ export default function GameDashboard() {
       <div className="flex-grow" />
       <div className="flex w-full text-2xl">
         <div className="flex-grow" />
-        <Button>Stop Game</Button>
+        <Button onClick={stopGame}>Stop Game</Button>
       </div>
     </Layout>
   );

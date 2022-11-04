@@ -53,18 +53,19 @@ function parseJWT(token: string | null): { user: User; expiry: number } | null {
   }
 }
 
+const token = window.localStorage.getItem("token");
+let parsedToken = parseJWT(token);
+if (parsedToken !== null) {
+  // Don't load token if expired
+  if (parsedToken.expiry < Date.now() / 1000) parsedToken = null;
+}
+
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(parsedToken?.user ?? null);
 
   useEffect(() => {
     // eslint-disable-next-line no-debugger
     // debugger;
-    const token = window.localStorage.getItem("token");
-    const parsedToken = parseJWT(token);
-    if (parsedToken === null) return;
-    console.log(parsedToken.expiry, Date.now() / 1000);
-    if (parsedToken.expiry < Date.now() / 1000) return; // Don't load token if expired
-    setUser(parsedToken.user);
   }, []);
 
   // call this function when you want to authenticate the user

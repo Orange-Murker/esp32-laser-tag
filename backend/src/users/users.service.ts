@@ -4,12 +4,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { AuthService } from '../auth/auth.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private readonly usersRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<void> {
@@ -25,7 +27,14 @@ export class UsersService {
   }
 
   async update(username: string, updateUserDto: UpdateUserDto): Promise<void> {
-    await this.usersRepository.update(username, updateUserDto);
+    const { password, role, displayName } = updateUserDto;
+    // FIXME: Should be separated out, but circular dependency
+    const hash = password === '' ? '' : await bcrypt.hash(password, 10);
+    await this.usersRepository.update(username, {
+      password: password === '' ? undefined : hash,
+      role,
+      displayName,
+    });
   }
 
   async remove(username: string): Promise<void> {

@@ -58,7 +58,7 @@ export function useUpdate(
 ) {
   const url = assembleUrl(strings, params);
 
-  return async (data: object, method: "GET" | "POST" | "DELETE") =>
+  return async (data: object, method: "GET" | "POST" | "DELETE" | "PATCH") =>
     (
       await fetch(url, {
         method: method ?? "POST",

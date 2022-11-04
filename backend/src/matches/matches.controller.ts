@@ -36,7 +36,8 @@ export class MatchesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.matchesService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.matchesService.stop(+id);
+    return { success: true };
   }
 }

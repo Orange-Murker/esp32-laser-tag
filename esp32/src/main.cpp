@@ -8,7 +8,6 @@
 
 static Game game {
     .time_to_respawn = 10,
-    .health = MAX_HEALTH,
     .ammo_remaining = MAX_AMMO,
 };
 

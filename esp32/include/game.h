@@ -1,4 +1,4 @@
-#define GUN_ID 0
+#define GUN_ID 1
 #define GUN_DAMAGE_DEALT 25
 #define MAX_HEALTH 250
 #define MAX_AMMO 4
@@ -24,11 +24,8 @@ struct GameState {
     Game* game;
 };
 
-
-void set_health(GameState* game_state, uint8_t health);
-uint8_t get_health(GameState* game_state);
-void add_shot_fired(GameState* game_state);
 void reload(GameState* game_state);
 void respawn(GameState* game_state);
+void despawn(GameState* game_state);
 bool check_shot_id(GameState* game_state, uint16_t id);
 void respawn_task(void* parms);

@@ -32,8 +32,9 @@ void ir_receive_task(void* parms) {
             xSemaphoreTake(game_state->mutex, portMAX_DELAY);
             
             if (IrReceiver.decodedIRData.protocol == NEC 
-                && check_shot_id(game_state, IrReceiver.decodedIRData.address)
+                && game_state->game->game_running
                 && game_state->game->health > 0
+                && check_shot_id(game_state, IrReceiver.decodedIRData.address)
             ) {
                 IrPacket ir_packet {
                     .kill = false,
@@ -73,7 +74,10 @@ void ir_receive_task(void* parms) {
 
 void shoot_ir() {
     xSemaphoreTake(game_state->mutex, portMAX_DELAY);
-    if (game_state->game->health != 0 && game_state->game->ammo_remaining != 0) {
+    if (game_state->game->game_running
+        && game_state->game->health > 0
+        && game_state->game->ammo_remaining > 0
+    ) {
         trigger_pressed_feedback();
         game_state->game->shots_fired++;
         game_state->game->ammo_remaining--;

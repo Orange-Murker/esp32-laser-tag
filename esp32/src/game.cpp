@@ -1,25 +1,6 @@
 #include "game.h"
 #include "feedback_to_the_user.h"
 
-void set_health(GameState* game_state, uint8_t health) {
-    xSemaphoreTake(game_state->mutex, portMAX_DELAY);
-    game_state->game->health = health;
-    xSemaphoreGive(game_state->mutex);
-}
-
-uint8_t get_health(GameState* game_state) {
-    xSemaphoreTake(game_state->mutex, portMAX_DELAY);
-    uint8_t health = game_state->game->health;
-    xSemaphoreGive(game_state->mutex);
-    return health;
-}
-
-void add_shot_fired(GameState* game_state) {
-    xSemaphoreTake(game_state->mutex, portMAX_DELAY);
-    (game_state->game->shots_fired)++;
-    xSemaphoreGive(game_state->mutex);
-}
-
 void reload(GameState* game_state) {
     xSemaphoreTake(game_state->mutex, portMAX_DELAY);
     game_state->game->ammo_remaining = MAX_AMMO;
@@ -34,7 +15,17 @@ void respawn(GameState* game_state) {
 }
 
 // Not thread safe
+void despawn(GameState* game_state) {
+    game_state->game->health = 0;
+    got_shot_feedback(0);
+}
+
+// Not thread safe
 bool check_shot_id(GameState* game_state, uint16_t id) {
+    if (id == GUN_ID) {
+        return false;
+    }
+
     if (!game_state->game->team_fire) {
         for (int i = 0; i < game_state->game->team_size; i++) {
             if (game_state->game->team[i] == id) {
@@ -44,6 +35,7 @@ bool check_shot_id(GameState* game_state, uint16_t id) {
     }
     return true;
 }
+
 void respawn_task(void* parms) {
     bool waiting_for_respawn = false;
     uint32_t respawn_after;

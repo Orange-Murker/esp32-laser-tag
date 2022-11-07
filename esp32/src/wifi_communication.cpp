@@ -3,13 +3,14 @@
 #include <HTTPClient.h>
 #include "game.h"
 #include "ir_communication.h"
+#include "feedback_to_the_user.h"
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
 const char* ssid = "LZR T4G SOLUTIONS";
 const char* password = "lasertagforall";
-String rest_address = "http://192.168.211.106:3001/api/";
-String token = "tutunustunsutunlt999349lt9";
+String rest_address = "http://192.168.1.10:3001/api/embedded/";
+String token = "abc";
 
 HTTPClient http;
 
@@ -27,10 +28,6 @@ void game_update_task(void* parms) {
     GameState* game_state = (GameState*) parms;
     while (true) {
         if (WiFi.status() == WL_CONNECTED) {
-            xSemaphoreTake(game_state->mutex, portMAX_DELAY);
-            bool game_running = game_state->game->game_running;
-            xSemaphoreGive(game_state->mutex);
-            
             // The document cannot get bigger than this with the current health and values of 250 and 25
             StaticJsonDocument<768> json;
             
@@ -57,7 +54,7 @@ void game_update_task(void* parms) {
             serializeJson(json, Serial);
             Serial.println("");
             
-            http.begin(rest_address + "embedded/" + token);
+            http.begin(rest_address + token);
             http.addHeader("Content-Type", "application/json");
             http.useHTTP10(true);
             int code = http.POST(json_str);
@@ -66,11 +63,22 @@ void game_update_task(void* parms) {
                 Serial.println(response);
                 StaticJsonDocument<1024> r_json;
                 deserializeJson(r_json, response);
-                bool game_running = r_json["game_running"];
 
                 JsonArray team = r_json["team"];
                 
                 xSemaphoreTake(game_state->mutex, portMAX_DELAY);
+
+                bool game_running_now = game_state->game->game_running;
+                bool game_running = r_json["game_running"];
+                if (game_running_now && !game_running) {
+                    despawn(game_state);
+                    game_state->game->game_running = game_running;
+                }
+                if (!game_running_now && game_running) {
+                    respawn(game_state);
+                    game_state->game->game_running = game_running;
+                }
+                
                 game_state->game->team_fire = r_json["team_fire"];
                 game_state->game->time_to_respawn = r_json["time_to_respawn"];
                 if (!team.isNull()) {

@@ -63,7 +63,7 @@ void initialise_feedback() {
     digitalWrite(VIBRATOR_PIN, LOW);
 
     FastLED.addLeds<NEOPIXEL, LED_PIN>(leds, NUM_LEDS);
-    show_health();
+    got_shot_feedback(0);
 }
 
 void feedback_update() {

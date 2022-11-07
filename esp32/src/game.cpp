@@ -43,7 +43,9 @@ void respawn_task(void* parms) {
     
     while (true) {
         xSemaphoreTake(game_state->mutex, portMAX_DELAY);
-        if (game_state->game->health <= 0) {
+        if (game_state->game->game_running
+            && game_state->game->health <= 0
+        ) {
             // Check the respawn condition
             switch (game_state->game->time_to_respawn) {
                 case -1:

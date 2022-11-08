@@ -7,7 +7,7 @@ import Button from "../components/Button";
 import { useUpdate } from "../hooks/useQuery";
 
 export function UserDetails() {
-  const { usernameOptional } = useParams();
+  const { username: usernameOptional } = useParams();
   const username = usernameOptional ?? "";
   const [isLoading, error, user] = useUser(username);
   const [state, setState] = useState<UserEditorState>({

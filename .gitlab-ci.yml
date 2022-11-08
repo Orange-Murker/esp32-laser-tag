@@ -47,6 +47,7 @@ build-web:
       --context "${CI_PROJECT_DIR}"
       --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
       --destination "${CI_REGISTRY_IMAGE}/backend:${CI_COMMIT_REF_SLUG}"
+      --cache
   needs: []
 #  rules:
 #    - if: $CI_PIPELINE_SOURCE == "merge_request_event"

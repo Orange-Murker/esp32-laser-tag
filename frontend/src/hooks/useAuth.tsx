@@ -2,40 +2,84 @@ import React, {
   createContext,
   PropsWithChildren,
   useContext,
+  useEffect,
   useMemo,
+  useState,
 } from "react";
-import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "./useLocalStorage";
-import { User } from "../auth";
+import { Roles, User } from "../auth";
+import Login from "../pages/Login";
 
 type A = {
   user: User | null;
-  login(data: User): Promise<void>;
+  login(token: string): void;
   logout(): void;
 };
 
 const AuthContext = createContext<A>({
   user: null,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  login: async () => {},
+  login: () => {},
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   logout: () => {},
 });
 
+function parseJWT(token: string | null): { user: User; expiry: number } | null {
+  if (token === null) return null;
+  try {
+    const data = JSON.parse(atob(token.split(".")[1]));
+
+    let role;
+    switch (data.role) {
+      case "Operator":
+        role = Roles.gameMaster;
+        break;
+      case "Admin":
+        role = Roles.admin;
+        break;
+      default:
+        role = Roles.player;
+    }
+
+    return {
+      user: {
+        username: data.username,
+        role,
+      },
+      expiry: data.exp,
+    };
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
+
+const token = window.localStorage.getItem("token");
+let parsedToken = parseJWT(token);
+if (parsedToken !== null) {
+  // Don't load token if expired
+  if (parsedToken.expiry < Date.now() / 1000) parsedToken = null;
+}
+
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useLocalStorage("user", null);
-  const navigate = useNavigate();
+  const [user, setUser] = useState<User | null>(parsedToken?.user ?? null);
+
+  useEffect(() => {
+    // eslint-disable-next-line no-debugger
+    // debugger;
+  }, []);
 
   // call this function when you want to authenticate the user
-  const login = async (data: User) => {
-    setUser(data);
-    navigate("/profile");
+  const login = (token: string) => {
+    localStorage.setItem("token", token);
+    const parsedToken = parseJWT(token);
+    if (parsedToken === null) return;
+    setUser(parsedToken.user);
   };
 
-  // call this function to sign out logged in user
+  // call this function to sign out logged-in user
   const logout = () => {
+    localStorage.removeItem("token");
     setUser(null);
-    navigate("/", { replace: true });
   };
 
   const value = useMemo(

@@ -1,26 +1,54 @@
 import { Injectable } from '@nestjs/common';
 import { CreateGunDto } from './dto/create-gun.dto';
 import { UpdateGunDto } from './dto/update-gun.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Gun } from './entities/gun.entity';
 
 @Injectable()
 export class GunsService {
-  create(createGunDto: CreateGunDto) {
-    return 'This action adds a new gun';
+  constructor(
+    @InjectRepository(Gun)
+    private gunsRepository: Repository<Gun>,
+  ) {}
+
+  async create(createGunDto: CreateGunDto) {
+    const { displayName, secret } = createGunDto;
+    await this.gunsRepository.insert({
+      displayName,
+      secret,
+    });
   }
 
   findAll() {
-    return `This action returns all guns`;
+    return this.gunsRepository.find({
+      order: {
+        id: 'ASC',
+      },
+    });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} gun`;
+    return this.gunsRepository.findOneBy({ id });
   }
 
-  update(id: number, updateGunDto: UpdateGunDto) {
-    return `This action updates a #${id} gun`;
+  async update(id: number, updateGunDto: UpdateGunDto) {
+    const { displayName, secret } = updateGunDto;
+    await this.gunsRepository.update(
+      { id },
+      {
+        displayName,
+        secret: secret === '' ? undefined : secret,
+      },
+    );
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} gun`;
+  async remove(id: number) {
+    await this.gunsRepository.delete(id);
+  }
+
+  async findIdBySecret(secret: string): Promise<number | null> {
+    const gun = await this.gunsRepository.findOneBy({ secret });
+    return !gun ? null : gun.id;
   }
 }

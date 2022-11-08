@@ -8,5 +8,6 @@ import { Hit } from './entities/hit.entity';
   imports: [TypeOrmModule.forFeature([Hit])],
   controllers: [HitsController],
   providers: [HitsService],
+  exports: [TypeOrmModule],
 })
 export class HitsModule {}

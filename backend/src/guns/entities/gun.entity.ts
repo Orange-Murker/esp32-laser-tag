@@ -7,4 +7,7 @@ export class Gun {
 
   @Column({ length: 60 })
   secret: string;
+
+  @Column()
+  displayName: string;
 }

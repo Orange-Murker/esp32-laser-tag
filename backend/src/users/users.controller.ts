@@ -16,8 +16,13 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    if (await this.usersService.findOne(createUserDto.username))
+      return {
+        error: 'Username already exists',
+      };
+    await this.usersService.create(createUserDto);
+    return {};
   }
 
   @Get()
@@ -26,16 +31,17 @@ export class UsersController {
   }
 
   @Get(':username')
-  findOne(@Param('username') username: string) {
+  async findOne(@Param('username') username: string) {
     return this.usersService.findOne(username);
   }
 
   @Patch(':username')
-  update(
+  async update(
     @Param('username') username: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(username, updateUserDto);
+    await this.usersService.update(username, updateUserDto);
+    return {};
   }
 
   @Delete(':username')

@@ -13,8 +13,8 @@ export const ProtectedRoute = ({
   const { user } = useAuth();
 
   if (
-    user !== null &&
-    (roles instanceof Array ? roles.includes(user.role) : user.role >= roles)
+    user === null ||
+    (roles instanceof Array ? roles.includes(user.role) : user.role < roles)
   ) {
     // user is not authenticated
     return <Navigate to="/login" />;

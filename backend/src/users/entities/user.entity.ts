@@ -14,4 +14,7 @@ export class User {
     enum: Role,
   })
   role: Role;
+
+  @Column({ length: 60 })
+  password: string;
 }

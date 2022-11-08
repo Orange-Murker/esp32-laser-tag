@@ -25,9 +25,9 @@ export class MatchesController {
     return this.matchesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.matchesService.findOne(+id);
+  @Get('active')
+  getActive() {
+    return this.matchesService.getActive();
   }
 
   @Patch(':id')
@@ -36,7 +36,8 @@ export class MatchesController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.matchesService.remove(+id);
+  async remove(@Param('id') id: string) {
+    await this.matchesService.stop(+id);
+    return { success: true };
   }
 }

@@ -4,28 +4,48 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    private readonly usersRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<void> {
-    await this.usersRepository.insert(createUserDto);
+    const { username, password, role, displayName } = createUserDto;
+    // FIXME: Should be separated out, but circular dependency
+    const hash = await bcrypt.hash(password, 10);
+    await this.usersRepository.insert({
+      username,
+      password: hash,
+      role,
+      displayName,
+    });
   }
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    return this.usersRepository.find({
+      order: {
+        username: 'ASC',
+      },
+    });
   }
 
-  findOne(username: string): Promise<User> {
+  async findOne(username: string) {
     return this.usersRepository.findOneBy({ username });
   }
 
   async update(username: string, updateUserDto: UpdateUserDto): Promise<void> {
-    await this.usersRepository.update(username, updateUserDto);
+    const { password, role, displayName } = updateUserDto;
+    // FIXME: Should be separated out, but circular dependency
+    const hash = password === '' ? '' : await bcrypt.hash(password, 10);
+    await this.usersRepository.update(username, {
+      password: password === '' ? undefined : hash,
+      role,
+      displayName,
+    });
   }
 
   async remove(username: string): Promise<void> {

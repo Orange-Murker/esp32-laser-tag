@@ -14,6 +14,18 @@ RUN yarn build
 
 FROM node:18-alpine as build-frontend
 
+WORKDIR /app
+
+COPY frontend/package.json frontend/yarn.lock ./
+
+RUN yarn install
+
+COPY frontend/tsconfig.json frontend/tailwind.config.js frontend/postcss.config.js ./
+COPY frontend/src ./src
+COPY frontend/public ./public
+
+RUN yarn build
+
 FROM node:18-alpine as production
 
 WORKDIR /app

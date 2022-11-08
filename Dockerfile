@@ -40,7 +40,7 @@ COPY --chown=node:node backend/package.json backend/yarn.lock ./
 RUN yarn install --frozen-lockfile --production
 
 COPY --chown=node:node --from=build-backend /app/dist ./dist
-#COPY --chown=node:node --from=build-frontend /app/dist ./public
+COPY --chown=node:node --from=build-frontend /app/build ./public
 
 EXPOSE 3000
 

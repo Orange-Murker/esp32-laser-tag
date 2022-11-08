@@ -14,7 +14,15 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<void> {
-    await this.usersRepository.insert(createUserDto);
+    const { username, password, role, displayName } = createUserDto;
+    // FIXME: Should be separated out, but circular dependency
+    const hash = await bcrypt.hash(password, 10);
+    await this.usersRepository.insert({
+      username,
+      password: hash,
+      role,
+      displayName,
+    });
   }
 
   findAll(): Promise<User[]> {

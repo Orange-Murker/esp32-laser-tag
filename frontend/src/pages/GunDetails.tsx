@@ -7,8 +7,8 @@ import { GunEditor, GunEditorState } from "../components/GunEditor";
 import { useUpdate } from "../hooks/useQuery";
 
 export function GunDetails() {
-  const { id } = useParams();
-  if (!id) return null;
+  const { idOptional } = useParams();
+  const id = idOptional ?? "";
   const [isLoading, error, gun] = useGun(id);
   const [state, setState] = useState<GunEditorState>({
     id: "",

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useUsers } from "../hooks/useUsers";
 import { useGuns } from "../hooks/useGuns";
 import Button from "./Button";
@@ -25,6 +25,7 @@ export function GameEditor({
 
   const userRef = useRef<HTMLSelectElement>(null);
   const gunRef = useRef<HTMLSelectElement>(null);
+  const teamRef = useRef<HTMLInputElement>(null);
 
   const selectedUsernames = state.teams.map((team) => team.player);
   const selectedGuns = state.teams.map((team) => team.gun);
@@ -35,13 +36,14 @@ export function GameEditor({
   const addUser = () => {
     const player = userRef.current?.value;
     const gun = parseInt(gunRef.current?.value ?? "");
-    if (!player || isNaN(gun)) return;
+    const team = parseInt(teamRef.current?.value ?? "");
+    if (!player || isNaN(gun) || isNaN(team)) return;
     setState({
       ...state,
       teams: state.teams.concat({
         player,
         gun,
-        team: 0,
+        team,
       }),
     });
   };
@@ -108,7 +110,7 @@ export function GameEditor({
 
       <div className="pt-3">
         <select
-          className="border border-black rounded-xl bg-white py-2 px-3 text-slate-800 mr-3"
+          className="border border-black rounded-xl bg-white bg-opacity-75 py-2 px-3 text-slate-800 mr-3"
           ref={userRef}
         >
           {users
@@ -120,7 +122,7 @@ export function GameEditor({
             ))}
         </select>
         <select
-          className="border border-black rounded-xl bg-white py-2 px-3 text-slate-800 mr-3"
+          className="border border-black rounded-xl bg-white bg-opacity-75 py-2 px-3 text-slate-800 mr-3"
           ref={gunRef}
         >
           {guns
@@ -131,6 +133,12 @@ export function GameEditor({
               </option>
             ))}
         </select>
+        <input
+          className="p-1 border border-black rounded-xl placeholder:text-slate-800 mt-3 bg-gray-100 bg-opacity-75 mr-3"
+          ref={teamRef}
+          placeholder="Team"
+          type="number"
+        />
         <Button onClick={addUser}>Add</Button>
       </div>
     </div>

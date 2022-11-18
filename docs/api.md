@@ -11,8 +11,7 @@ via the URL for authentication
 
 ### Status update
 
-A POST request to `/embedded/{token}` should adhere to the below spec.
-The response body will be empty, and should be ignored.
+A POST request to `/embedded/{token}` should adhere to the below spec where kill is optional.
 
 ```ts
 export class StatusUpdateDto {
@@ -27,9 +26,7 @@ export class StatusUpdateDto {
 }
 ```
 
-### Game status
-
-A GET request to `/embedded/{token}` will get a response according to the below spec.
+The response body is as follows:
 
 ```ts
 export class GameStatusDto {
@@ -37,5 +34,29 @@ export class GameStatusDto {
   team_fire: boolean;
   time_to_respawn: number;
   team: number[];
+}
+```
+
+Below you can see an example of the JSON packet sent by the gun (prettified):
+
+```json
+{
+  "health": 250,
+  "deaths": 0,
+  "shots_fired": 10,
+  "hits": [
+    { "shooter": 1, "damage": 25 },
+    { "shooter": 1, "damage": 25, "kill": true}
+  ]
+}
+```
+
+And the response by the server where the team is an array of gun IDs of people in our team:
+```json
+{
+    "game_running": true,
+    "team_fire": false,
+    "time_to_respawn": 10,
+    "team": [1, 2, 3],
 }
 ```

@@ -29,7 +29,7 @@ export function CreateGun() {
   return (
     <Layout>
       <form className="w-full h-full flex flex-col">
-        <div className="text-white text-5xl text-center">New User</div>
+        <div className="text-white text-5xl text-center">New Gun</div>
         <hr className="border-emerald-700 my-4" />
         <GunEditor state={state} setState={setState} />
         <div className="text-orange-700">{error}</div>

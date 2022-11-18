@@ -29,8 +29,9 @@ services:
     environment:
       DB_HOST: db
 
-  pio:
-    build:
-      context: esp32
-    volumes:
-      - ./esp32:/opt/workspace
+# Does not work yet
+#   pio:
+#     build:
+#       context: esp32
+#     volumes:
+#       - ./esp32:/opt/workspace

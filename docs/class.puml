@@ -18,16 +18,10 @@ frame "Class diagram Pi15-42" {
       +secret: string
     }
 
-    class games {
-      +id: number
-      +started: Date
-      +ended: Date | null
-    }
-
     class matches {
       +id: number
       +options: json
-      +game: number
+      +running: boolean
     }
 
     class plays {
@@ -58,7 +52,6 @@ frame "Class diagram Pi15-42" {
     }
 
     users -- Role
-    matches -- games
     plays -- matches
     plays -- guns
     plays -- users

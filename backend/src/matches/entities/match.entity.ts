@@ -5,7 +5,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Game } from '../../games/entities/game.entity';
 import { Play } from '../../plays/entities/play.entity';
 
 @Entity()
@@ -18,9 +17,6 @@ export class Match {
     friendlyFire: boolean;
     respawnTime: number;
   };
-
-  @ManyToOne(() => Game, (game) => game.id)
-  game: Game;
 
   @Column({
     default: true,

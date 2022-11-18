@@ -89,6 +89,9 @@ Guns and send their current status and poll the server for an update at the same
 
 ## Server
 
+![Login](docs/images/Login.png)
+![Create Game](docs/images/Create_Game.png)
+
 You can use the provided `docker-compose.yml` file to start the game server.
 
 React based frontend.

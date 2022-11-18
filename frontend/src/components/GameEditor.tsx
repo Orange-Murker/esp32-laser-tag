@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useUsers } from "../hooks/useUsers";
 import { useGuns } from "../hooks/useGuns";
 import Button from "./Button";
@@ -22,6 +22,9 @@ export function GameEditor({
 }) {
   const [isLoadingUsers, errorUsers, users] = useUsers();
   const [isLoadingGuns, errorGuns, guns] = useGuns();
+
+  //Used for disabling settings when preset is chosen
+  const [preset, setPreset] = useState("Custom");
 
   const userRef = useRef<HTMLSelectElement>(null);
   const gunRef = useRef<HTMLSelectElement>(null);
@@ -56,36 +59,109 @@ export function GameEditor({
   };
 
   return (
-    <div>
-      <label htmlFor="friendly_fire">Friendly fire: </label>
-      <input
-        // className="p-1 border border-black rounded-xl placeholder:text-slate-800 mt-3 bg-gray-100 bg-opacity-75"
-        id="friendly_fire"
-        type="checkbox"
-        checked={state.friendlyFire}
-        onChange={(event) =>
-          setState({
-            ...state,
-            friendlyFire: event.target.checked,
-          })
-        }
-      />
-      <br />
-      <label htmlFor="respawn_time">Respawn time: </label>
-      <input
-        className="p-1 border border-black rounded-xl placeholder:text-slate-800 mt-3 bg-gray-100 bg-opacity-75"
-        id="respawn_time"
-        type="number"
-        value={isNaN(state.respawnTime) ? "" : state.respawnTime}
-        onChange={(event) =>
-          setState({
-            ...state,
-            respawnTime: parseInt(event.target.value),
-          })
-        }
-      />
+    <div className="mb-3">
+      <table className="text-black border-transparent p-4 w-full align-middle mt-4 table-fixed text-center">
+        <thead>
+          <tr>
+            <th>
+              <label>Game mode:</label>
+            </th>
+            <th>
+              <label htmlFor="friendly_fire">Friendly fire: </label>
+            </th>
+            <th>
+              <label htmlFor="respawn_time">Respawn time:</label>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <select
+                className="border border-black rounded-xl bg-white py-2 px-3 text-slate-800 w-48 h-10"
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  //changing game settings according to the preset
+                  setPreset(e.target.value);
+                  switch (e.target.value) {
+                    case "Custom": {
+                      break;
+                    }
+                    case "Solo Deathmatch": {
+                      setState({
+                        ...state,
+                        friendlyFire: true,
+                        respawnTime: 3,
+                      });
+                      break;
+                    }
+                    case "Team Deathmatch": {
+                      setState({
+                        ...state,
+                        friendlyFire: false,
+                        respawnTime: 3,
+                      });
+                      break;
+                    }
+                    case "Solo Battle Royale": {
+                      setState({
+                        ...state,
+                        friendlyFire: true,
+                        respawnTime: -1,
+                      });
+                      break;
+                    }
+                    case "Team Battle Royale": {
+                      setState({
+                        ...state,
+                        friendlyFire: false,
+                        respawnTime: -1,
+                      });
+                      break;
+                    }
+                  }
+                }}
+              >
+                <option selected>Custom</option>
+                <option>Solo Deathmatch</option>
+                <option>Team Deathmatch</option>
+                <option>Solo Battle Royale</option>
+                <option>Team Battle Royale</option>
+              </select>
+            </td>
+            <td>
+              <input
+                disabled={preset !== "Custom"}
+                id="friendly_fire"
+                type="checkbox"
+                checked={state.friendlyFire}
+                onChange={(event) =>
+                  setState({
+                    ...state,
+                    friendlyFire: event.target.checked,
+                  })
+                }
+              />
+            </td>
+            <td>
+              <input
+                className="border border-black rounded-xl bg-white py-2 px-3 text-slate-800 p-1 placeholder:text-slate-800 w-48 h-10"
+                disabled={preset !== "Custom"}
+                id="respawn_time"
+                type="number"
+                value={isNaN(state.respawnTime) ? "" : state.respawnTime}
+                onChange={(event) =>
+                  setState({
+                    ...state,
+                    respawnTime: parseInt(event.target.value),
+                  })
+                }
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-      <table className="text-white border border-emerald-700 rounded-xl border-separate p-4 w-full text-center align-middle mt-4">
+      <table className="text-white border border-emerald-700 rounded-xl border-separate p-4 w-full align-middle mt-4 table-fixed text-center">
         <thead>
           <tr className="text-emerald-700">
             <th>Player</th>
@@ -105,42 +181,51 @@ export function GameEditor({
               </td>
             </tr>
           ))}
+          <tr>
+            <td>
+              <select
+                className="border border-black rounded-xl bg-white py-2 text-slate-800 w-48"
+                ref={userRef}
+              >
+                {users
+                  .filter((user) => !selectedUsernames.includes(user.username))
+                  .map((user) => (
+                    <option key={user.username} value={user.username}>
+                      {user.displayName}
+                    </option>
+                  ))}
+              </select>
+            </td>
+            <td>
+              <select
+                className="border border-black rounded-xl bg-white py-2 text-slate-800 w-48"
+                ref={gunRef}
+              >
+                {guns
+                  .filter((gun) => !selectedGuns.includes(gun.id))
+                  .map((gun) => (
+                    <option key={gun.id} value={gun.id}>
+                      {gun.displayName}
+                    </option>
+                  ))}
+              </select>
+            </td>
+            <td>
+              <input
+                className="p-1 placeholder:text-slate-800 border border-black rounded-xl bg-white py-2 text-slate-800 w-48"
+                ref={teamRef}
+                placeholder="Team"
+                type="number"
+              />
+            </td>
+            <td>
+              <Button onClick={addUser} className="w-48">
+                Add
+              </Button>
+            </td>
+          </tr>
         </tbody>
       </table>
-
-      <div className="pt-3">
-        <select
-          className="border border-black rounded-xl bg-white bg-opacity-75 py-2 px-3 text-slate-800 mr-3"
-          ref={userRef}
-        >
-          {users
-            .filter((user) => !selectedUsernames.includes(user.username))
-            .map((user) => (
-              <option key={user.username} value={user.username}>
-                {user.displayName}
-              </option>
-            ))}
-        </select>
-        <select
-          className="border border-black rounded-xl bg-white bg-opacity-75 py-2 px-3 text-slate-800 mr-3"
-          ref={gunRef}
-        >
-          {guns
-            .filter((gun) => !selectedGuns.includes(gun.id))
-            .map((gun) => (
-              <option key={gun.id} value={gun.id}>
-                {gun.displayName}
-              </option>
-            ))}
-        </select>
-        <input
-          className="p-1 border border-black rounded-xl placeholder:text-slate-800 mt-3 bg-gray-100 bg-opacity-75 mr-3"
-          ref={teamRef}
-          placeholder="Team"
-          type="number"
-        />
-        <Button onClick={addUser}>Add</Button>
-      </div>
     </div>
   );
 }
